@@ -151,3 +151,32 @@ test('no names or affiliations on the page', () => {
     assert.equal(hit, null, `${file}: "${hit?.[0]}"`);
   }
 });
+
+// ---------------------------------------------------------------------------
+test('disclaimer screen comes first, with a continue button; the rest starts hidden', () => {
+  const disclaimerAt = HTML.indexOf('id="disclaimer"');
+  const appAt = HTML.indexOf('<div id="app" hidden>');
+  assert.ok(disclaimerAt > 0 && appAt > disclaimerAt, 'disclaimer before the hidden app');
+  assert.match(HTML, /<button type="button" class="primary" id="continue">/);
+  const text = visibleText(HTML.slice(disclaimerAt, appAt));
+  for (const line of ['Not financial advice.', '“indicative”', '14 November 2026', 'Nothing you type here leaves your browser.']) {
+    assert.ok(text.includes(line), `disclaimer mentions: ${line}`);
+  }
+});
+
+test('three tabs, each a hidden section linked from the tab bar', () => {
+  for (const id of ['bajaj', 'paisabazaar', 'compare']) {
+    assert.match(HTML, new RegExp(`<a href="#${id}" data-tab="${id}">`), `tab link ${id}`);
+    assert.match(HTML, new RegExp(`<section id="${id}" class="tab"[^>]*hidden>`), `hidden section ${id}`);
+  }
+});
+
+test('each calculator tab has only its own boxes, each with a label', () => {
+  const section = (id) => HTML.slice(HTML.indexOf(`<section id="${id}"`), HTML.indexOf('</section>', HTML.indexOf(`<section id="${id}"`)));
+  const inputs = (id) => [...section(id).matchAll(/<input id="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(inputs('bajaj'), ['bajaj-income', 'bajaj-expense']);
+  assert.deepEqual(inputs('paisabazaar'), ['pb-age', 'pb-income', 'pb-emi', 'pb-desired', 'pb-rate', 'pb-tenure']);
+  for (const id of [...inputs('bajaj'), ...inputs('paisabazaar')]) {
+    assert.ok(HTML.includes(`<label for="${id}">`), `label for ${id}`);
+  }
+});

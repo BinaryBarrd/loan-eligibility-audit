@@ -42,6 +42,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html { -webkit-text-size-adjust: 100%; }
 
@@ -60,11 +61,11 @@ body {
   padding: 0 16px;
 }
 
-h1, h2, h3, h4 { line-height: 1.25; margin: 0; }
-h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); letter-spacing: -0.01em; }
-h2 { font-size: 1.4rem; margin-bottom: 0.25rem; }
-h3 { font-size: 1.2rem; }
-h4 { font-size: 0.95rem; margin: 1.25rem 0 0.4rem; }
+h1, h2, h3 { line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(1.6rem, 6vw, 2.3rem); letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); }
+h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+h2:focus { outline: none; }
 
 p { margin: 0 0 0.75rem; }
 ul { margin: 0; padding-left: 1.2rem; }
@@ -72,7 +73,7 @@ li { margin-bottom: 0.4rem; }
 q { quotes: "“" "”"; }
 
 a { color: inherit; text-underline-offset: 0.18em; }
-a:focus-visible, input:focus-visible {
+a:focus-visible, button:focus-visible, input:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
@@ -84,27 +85,96 @@ a:focus-visible, input:focus-visible {
 
 .muted { color: var(--muted); }
 .small { font-size: 0.875rem; }
+.note { color: var(--muted); }
 
-/* --- Top ------------------------------------------------------------------ */
-.top { padding-top: 2rem; padding-bottom: 1.5rem; }
-.lede { font-size: 1.125rem; margin-top: 0.75rem; max-width: 40rem; }
-.stamp {
-  display: inline-block;
-  font-size: 0.875rem;
-  color: var(--muted);
+/* --- Screen 1: disclaimer -------------------------------------------------- */
+.disclaimer {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.disclaimer-card {
+  max-width: 40rem;
+  margin: 0 auto;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.2rem 0.75rem;
+  border-radius: 14px;
+  padding: 1.5rem 1.25rem;
+}
+.eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.lede { font-size: 1.1rem; margin-top: 0.75rem; }
+.disclaimer-list { padding-left: 1.1rem; margin: 1rem 0 1.5rem; }
+.disclaimer-list li { margin-bottom: 0.7rem; }
+
+button.primary {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--diff-bg);
+  color: var(--diff-ink);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button.primary:hover { opacity: 0.92; }
+
+/* --- Screen 2: header and tabs --------------------------------------------- */
+.top { background: var(--bg); }
+.site-title { font-weight: 700; font-size: 1.05rem; margin: 1rem 0 0.25rem; }
+.stamp { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.tabs-inner {
+  display: flex;
+  gap: 0.25rem;
+}
+.tabs a {
+  flex: 1 1 0;
+  text-align: center;
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 0.25rem 0.7rem;
+  border-bottom: 3px solid transparent;
+  min-height: 48px;
+}
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 
-main { padding-bottom: 3rem; }
-.intro { color: var(--muted); }
+main { padding-top: 1.5rem; padding-bottom: 3rem; }
 
-/* --- Form ----------------------------------------------------------------- */
-.person {
+.tab-head { margin-bottom: 1.25rem; }
+.tab-head h2 { margin-bottom: 0.35rem; }
+.kind { color: var(--muted); margin: 0; }
+.kind a { color: var(--ink); white-space: nowrap; }
+
+/* --- Calculator tab: inputs + result --------------------------------------- */
+.calc {
   display: grid;
   gap: 1rem;
-  margin: 1rem 0 1.5rem;
+  align-items: start;
 }
 
 fieldset {
@@ -121,7 +191,8 @@ legend {
   margin-left: -0.35rem;
 }
 
-.field { margin-bottom: 0.9rem; }
+.field-grid { display: grid; gap: 0 1rem; }
+.field { margin-bottom: 0.9rem; min-width: 0; }
 .field label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
 
 .input {
@@ -153,58 +224,32 @@ legend {
   align-items: center;
   padding: 0 0 0 0.75rem;
   color: var(--muted);
-  font-size: 1rem;
 }
-.affix.after { padding: 0 0.75rem 0 0; }
+.affix.after { padding: 0 0.75rem 0 0; white-space: nowrap; }
 .money input { padding-left: 0.35rem; }
 
 .help { font-size: 0.875rem; color: var(--muted); margin: 0.3rem 0 0; }
 .err { font-size: 0.875rem; color: var(--error); font-weight: 600; margin: 0.2rem 0 0; }
 .err:empty { display: none; }
-.note { color: var(--muted); }
-
-/* --- Cards ---------------------------------------------------------------- */
-.cards {
-  display: grid;
-  gap: 1rem;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1rem;
-  min-width: 0;
-}
-
-.card-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 0.6rem;
-  margin-bottom: 0.75rem;
-}
-.card-head a { display: inline-block; padding: 0.25rem 0; }
-.kind { margin: 0; color: var(--muted); font-size: 0.9rem; }
 
 /* "What the page would show": a neutral quotation of the site's wording. */
+.result { min-width: 0; }
 .shows {
   background: var(--quote-bg);
   border-left: 4px solid var(--field-line);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  min-height: 7.5rem;
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
 }
 .shows p { margin-bottom: 0.25rem; }
 .shows-label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted);
 }
 .site-text { font-size: 1.05rem; }
 .amount {
-  font-size: clamp(1.8rem, 8vw, 2.4rem);
+  font-size: clamp(2rem, 9vw, 2.6rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
@@ -216,7 +261,7 @@ legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1.25rem;
-  margin: 0.5rem 0 0;
+  margin: 0.6rem 0 0;
   font-size: 0.9rem;
 }
 .site-facts dt { color: var(--muted); }
@@ -233,27 +278,29 @@ legend {
   margin-bottom: 0.5rem;
 }
 
-.steps:not(:empty) {
-  margin-top: 0.75rem;
-  border-top: 1px dashed var(--line);
-  padding-top: 0.6rem;
+/* --- Calculator tab: explanation blocks ------------------------------------ */
+.explain {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
-.steps p { margin-bottom: 0.25rem; font-size: 0.95rem; }
-.steps-label { font-weight: 600; font-size: 0.85rem !important; color: var(--muted); }
-
-/* --- Difference ----------------------------------------------------------- */
-.difference {
-  margin: 1rem 0 0;
-  padding: 0.9rem 1rem;
+.explain-block {
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--diff-bg);
-  color: var(--diff-ink);
-  font-size: 1.1rem;
-  font-weight: 600;
+  padding: 1rem;
+  min-width: 0;
 }
+.explain-block p, .explain-block li { font-size: 0.95rem; }
 
-/* --- Later sections -------------------------------------------------------- */
-main > section + section { margin-top: 3rem; }
+.next { margin-top: 1.5rem; }
+.next a { display: inline-block; padding: 0.5rem 0; font-weight: 600; }
+
+/* --- Compare tab ------------------------------------------------------------ */
+.block { margin-top: 2.25rem; }
+.block:first-of-type { margin-top: 0; }
+.block h3 { font-size: 1.2rem; margin-bottom: 0.6rem; }
+.intro { color: var(--muted); }
 
 .examples {
   width: 100%;
@@ -301,7 +348,7 @@ main > section + section { margin-top: 3rem; }
 .draft {
   display: inline-block;
   vertical-align: middle;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--notice-ink);
@@ -310,7 +357,6 @@ main > section + section { margin-top: 3rem; }
   border-radius: 4px;
   padding: 0.05rem 0.4rem;
 }
-h2 { margin-bottom: 0.75rem; }
 
 .links { list-style: none; padding: 0; }
 .links li { margin-bottom: 0.25rem; }
@@ -325,10 +371,14 @@ h2 { margin-bottom: 0.75rem; }
 }
 .foot p { margin-bottom: 0.3rem; }
 
-/* --- Wider screens -------------------------------------------------------- */
+/* --- Wider screens ---------------------------------------------------------- */
 @media (min-width: 640px) {
-  .person { grid-template-columns: 1fr 1fr; align-items: start; }
+  .disclaimer-card { padding: 2.25rem 2.25rem 2rem; }
+  .field-grid { grid-template-columns: 1fr 1fr; }
 }
-@media (min-width: 800px) {
-  .cards { grid-template-columns: 1fr 1fr; align-items: start; }
+@media (min-width: 860px) {
+  .calc { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .result { position: sticky; top: 4.5rem; }
+  .explain { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tabs a { flex: 0 0 auto; padding-left: 1rem; padding-right: 1rem; }
 }

@@ -12,187 +12,263 @@
   <script type="module" src="app.js"></script>
 </head>
 <body>
-  <header class="top wrap">
-    <h1>Same person, different “You are eligible”</h1>
-    <p class="lede">Two popular loan-eligibility calculators give the same person very different answers. Here is what each one assumes.</p>
-    <p class="stamp">Tested on 14 November 2026. The sites may have changed since.</p>
-  </header>
+  <!-- Screen 1: disclaimer. The rest of the page stays hidden until "Continue". -->
+  <section id="disclaimer" class="disclaimer wrap" aria-labelledby="disclaimer-h">
+    <div class="disclaimer-card">
+      <p class="eyebrow">Before you start</p>
+      <h1 id="disclaimer-h">Same person, different “You are eligible”</h1>
+      <p class="lede">This page compares two public personal-loan eligibility calculators, from Bajaj Finserv and Paisabazaar. Please read this first.</p>
+      <ul class="disclaimer-list">
+        <li><strong>Not financial advice.</strong> This is a research comparison. It does not tell you whether you will get a loan.</li>
+        <li><strong>Calculators, not loan offers.</strong> Both sites call their results “indicative”. Real lenders also look at credit score, job, documents and more.</li>
+        <li><strong>Recreated, not live.</strong> The results here are worked out from rules we reconstructed by testing the two public calculator pages on 14 November 2026. The sites may have changed since.</li>
+        <li><strong>Not connected to either company.</strong> This page is not made by, or connected to, Bajaj Finserv or Paisabazaar.</li>
+        <li><strong>Private.</strong> Nothing you type here leaves your browser.</li>
+      </ul>
+      <noscript><p class="notice">This page needs JavaScript to show the calculators.</p></noscript>
+      <button type="button" class="primary" id="continue">I’ve read this, continue</button>
+    </div>
+  </section>
 
-  <main class="wrap">
-    <section id="try" aria-labelledby="try-h">
-      <h2 id="try-h">Try it yourself</h2>
-      <p class="intro">Change any number. Both results update as you type.</p>
-
-      <noscript><p class="notice">This part of the page needs JavaScript to calculate the results.</p></noscript>
-
-      <form id="person" class="person" novalidate autocomplete="off">
-        <fieldset>
-          <legend>Used by both calculators</legend>
-          <div class="field">
-            <label for="income">Monthly income (₹)</label>
-            <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="income" name="income" type="text" inputmode="numeric" value="40,000" aria-describedby="income-help income-err"></div>
-            <p class="help" id="income-help" data-help="income"></p>
-            <p class="err" id="income-err" aria-live="polite"></p>
-          </div>
-          <div class="field">
-            <label for="emi">Monthly EMIs you already pay (₹)</label>
-            <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="emi" name="emi" type="text" inputmode="numeric" value="10,000" aria-describedby="emi-help emi-err"></div>
-            <p class="help" id="emi-help" data-help="emi"></p>
-            <p class="err" id="emi-err" aria-live="polite"></p>
-          </div>
-          <p class="note small">Bajaj Finserv asks for “monthly expenses” and Paisabazaar for “existing EMIs”. Here we use your EMIs for both.</p>
-        </fieldset>
-
-        <fieldset>
-          <legend>Used only by Paisabazaar</legend>
-          <div class="field">
-            <label for="age">Age</label>
-            <div class="input"><input id="age" name="age" type="text" inputmode="numeric" value="29" aria-describedby="age-help age-err"><span class="affix after" aria-hidden="true">years</span></div>
-            <p class="help" id="age-help" data-help="age"></p>
-            <p class="err" id="age-err" aria-live="polite"></p>
-          </div>
-          <div class="field">
-            <label for="desired">Loan amount you want (₹)</label>
-            <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="desired" name="desired" type="text" inputmode="numeric" value="20,00,000" aria-describedby="desired-help desired-err"></div>
-            <p class="help" id="desired-help" data-help="desired"></p>
-            <p class="err" id="desired-err" aria-live="polite"></p>
-          </div>
-          <div class="field">
-            <label for="rate">Interest rate for the Paisabazaar calculation (%)</label>
-            <div class="input"><input id="rate" name="rate" type="text" inputmode="decimal" value="10" aria-describedby="rate-help rate-err"><span class="affix after" aria-hidden="true">% a year</span></div>
-            <p class="help" id="rate-help" data-help="rate"></p>
-            <p class="err" id="rate-err" aria-live="polite"></p>
-          </div>
-          <div class="field">
-            <label for="tenure">Loan tenure for the Paisabazaar calculation (years, 1–10)</label>
-            <div class="input"><input id="tenure" name="tenure" type="text" inputmode="numeric" value="5" aria-describedby="tenure-help tenure-err"><span class="affix after" aria-hidden="true">years</span></div>
-            <p class="help" id="tenure-help" data-help="tenure"></p>
-            <p class="err" id="tenure-err" aria-live="polite"></p>
-          </div>
-          <p class="note small" id="bajaj-fixed-note"></p>
-        </fieldset>
-      </form>
-
-      <div class="cards">
-        <article class="card" id="card-bajaj" aria-labelledby="bajaj-h">
-          <header class="card-head">
-            <h3 id="bajaj-h"><a href="https://www.bajajfinserv.in/personal-loan-eligibility-calculator" rel="noopener noreferrer" target="_blank">Bajaj Finserv<span class="sr-only"> (opens the original calculator in a new tab)</span></a></h3>
-            <p class="kind">a lender</p>
-          </header>
-          <div class="shows" data-slot="shows"></div>
-          <div class="notices" data-slot="notices"></div>
-          <h4>What’s behind this number</h4>
-          <ul data-slot="behind"></ul>
-          <div class="steps" data-slot="steps"></div>
-          <h4>What it ignores</h4>
-          <ul data-slot="ignores"></ul>
-        </article>
-
-        <article class="card" id="card-pb" aria-labelledby="pb-h">
-          <header class="card-head">
-            <h3 id="pb-h"><a href="https://www.paisabazaar.com/personal-loan/eligibility-calculator/" rel="noopener noreferrer" target="_blank">Paisabazaar<span class="sr-only"> (opens the original calculator in a new tab)</span></a></h3>
-            <p class="kind">a loan marketplace</p>
-          </header>
-          <div class="shows" data-slot="shows"></div>
-          <div class="notices" data-slot="notices"></div>
-          <h4>What’s behind this number</h4>
-          <ul data-slot="behind"></ul>
-          <div class="steps" data-slot="steps"></div>
-          <h4>What it ignores</h4>
-          <ul data-slot="ignores"></ul>
-        </article>
+  <!-- Screen 2: the comparison, in three tabs. -->
+  <div id="app" hidden>
+    <header class="top">
+      <div class="wrap">
+        <p class="site-title">Same person, different “You are eligible”</p>
+        <p class="stamp">Tested on 14 November 2026. The sites may have changed since.</p>
       </div>
+      <nav class="tabs" aria-label="Sections">
+        <div class="wrap tabs-inner">
+          <a href="#bajaj" data-tab="bajaj">Bajaj Finserv</a>
+          <a href="#paisabazaar" data-tab="paisabazaar">Paisabazaar</a>
+          <a href="#compare" data-tab="compare">Compare</a>
+        </div>
+      </nav>
+    </header>
 
-      <p class="difference" id="difference"></p>
-      <div class="sr-only" id="announce" aria-live="polite" aria-atomic="true"></div>
-    </section>
+    <main class="wrap">
+      <!-- Tab 1: Bajaj Finserv -->
+      <section id="bajaj" class="tab" data-calc="bajaj" aria-labelledby="bajaj-h" hidden>
+        <div class="tab-head">
+          <h2 id="bajaj-h" tabindex="-1">Bajaj Finserv</h2>
+          <p class="kind">A lender. <a href="https://www.bajajfinserv.in/personal-loan-eligibility-calculator" rel="noopener noreferrer" target="_blank">Open the original calculator<span class="sr-only"> (opens in a new tab)</span></a></p>
+        </div>
 
-    <section id="examples" aria-labelledby="examples-h">
-      <h2 id="examples-h">Four example people</h2>
-      <p class="intro">Same person, different “You are eligible” (5-year loan). Every amount below was seen on the sites, except one cell marked <em>rule</em>.</p>
-      <table class="examples">
-        <thead>
-          <tr>
-            <th scope="col">Person</th>
-            <th scope="col">Bajaj</th>
-            <th scope="col">Paisabazaar at 10%</th>
-            <th scope="col">Paisabazaar at 20%</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">A: 29, ₹40k income, ₹10k EMIs</th>
-            <td data-label="Bajaj" data-check="bajaj 40000 10000">₹4,00,000</td>
-            <td data-label="Paisabazaar at 10%" data-check="pb 29 2000000 10 5 40000 10000">₹5,64,784</td>
-            <td data-label="Paisabazaar at 20%" data-check="pb 29 2000000 20 5 40000 10000">₹4,52,935</td>
-          </tr>
-          <tr>
-            <th scope="row">B: 29, ₹40k income, no EMIs</th>
-            <td data-label="Bajaj" data-check="bajaj 40000 0">₹4,00,000</td>
-            <td data-label="Paisabazaar at 10%" data-check="pb 29 2000000 10 5 40000 0">₹9,60,000</td>
-            <td data-label="Paisabazaar at 20%" data-check="pb 29 2000000 20 5 40000 0">₹8,30,380</td>
-          </tr>
-          <tr>
-            <th scope="row">C: 35, ₹60k income, ₹35k EMIs</th>
-            <td data-label="Bajaj" data-check="bajaj 60000 35000">₹4,70,654</td>
-            <td data-label="Paisabazaar at 10%" data-check="pb 35 2000000 10 5 60000 35000">not eligible (debts too high)</td>
-            <td data-label="Paisabazaar at 20%" data-check="pb 35 2000000 20 5 60000 35000" data-rule="true">not eligible (<em>rule</em>: the debt check doesn’t use the rate)</td>
-          </tr>
-          <tr>
-            <th scope="row">D: 59, ₹80k income, no EMIs</th>
-            <td data-label="Bajaj" data-check="bajaj 80000 0">₹8,00,000</td>
-            <td data-label="Paisabazaar at 10%" data-check="pb 59 2000000 10 5 80000 0">₹5,00,478 (tenure cut to 1 year)</td>
-            <td data-label="Paisabazaar at 20%" data-check="pb 59 2000000 20 5 80000 0">₹4,74,985 (tenure cut to 1 year)</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="note small">(Bajaj asks for “expenses” and Paisabazaar for “existing EMIs”. In this table both are the person’s EMIs.)</p>
-    </section>
+        <div class="calc">
+          <form class="inputs" id="form-bajaj" novalidate autocomplete="off">
+            <fieldset>
+              <legend>What this calculator asks for</legend>
+              <div class="field">
+                <label for="bajaj-income">Monthly income (₹)</label>
+                <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="bajaj-income" type="text" inputmode="numeric" value="40,000" data-kind="money" aria-describedby="bajaj-income-help bajaj-income-err"></div>
+                <p class="help" id="bajaj-income-help" data-help="bajaj-income"></p>
+                <p class="err" id="bajaj-income-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="bajaj-expense">Monthly expenses (₹)</label>
+                <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="bajaj-expense" type="text" inputmode="numeric" value="10,000" data-kind="money" aria-describedby="bajaj-expense-help bajaj-expense-err"></div>
+                <p class="help" id="bajaj-expense-help" data-help="bajaj-expense"></p>
+                <p class="err" id="bajaj-expense-err" aria-live="polite"></p>
+              </div>
+              <p class="note small" id="bajaj-fixed-note"></p>
+            </fieldset>
+          </form>
 
-    <section id="findings" aria-labelledby="findings-h">
-      <h2 id="findings-h">What we found</h2>
-      <ul class="findings">
-        <li><strong>Not AI, just fixed formulas.</strong> Each calculator follows one fixed formula, and it runs in your browser: changing the inputs sends nothing to the sites’ servers.</li>
-        <li><strong>No credit score.</strong> Neither calculator asks for a credit score or any credit history, though both word the result as <em>your</em> eligibility.</li>
-        <li><strong>The assumptions are not shown next to the result.</strong> Bajaj assumes a yearly interest rate of 10% over 5 years, and that up to 75% of income can go to monthly instalments plus expenses. Paisabazaar assumes up to 55% of income can go to monthly instalments, and caps the loan at 24 × monthly income. Neither result says so.</li>
-        <li><strong>City makes no difference.</strong> Bajaj requires a city, but any city, even a made-up one (“Xyzabc”), gives the same amount.</li>
-        <li><strong>Tenure is silently capped.</strong> Paisabazaar’s tenure slider goes to 10 years, but it never uses more than 5. Choose 6 or 7 and it shows “Eligible Tenure 5 Years”.</li>
-        <li><strong>“Eligible” for ₹47.</strong> Both calculators say “You are eligible” for as little as ₹47, when only ₹1 a month of room is left. Bajaj also says “You are eligible for a personal loan upto ₹0”.</li>
-        <li><strong>The page names inputs it doesn’t ask for.</strong> Paisabazaar’s page says it estimates “based on your income, employment type, monthly expenses and more”. The calculator asks for neither employment type nor monthly expenses.</li>
-      </ul>
-    </section>
+          <div class="result">
+            <div class="shows" data-slot="shows"></div>
+            <div class="notices" data-slot="notices"></div>
+          </div>
+        </div>
 
-    <section id="method" aria-labelledby="method-h">
-      <h2 id="method-h">How we tested <span class="draft">[DRAFT]</span></h2>
-      <p>On 14 November 2026 we opened each calculator in a normal web browser. We typed in different values (income, expenses or EMIs, age, interest rate, tenure), usually changing one thing at a time, and wrote down what the calculator showed. From these input–output pairs we worked out the rule each calculator follows. We then tested each rule on inputs we had not used to build it. Across 76 checks, the rules matched what the sites showed to within ₹1 of rounding.</p>
-      <p>We did not log in, enter a PAN, phone number or OTP, or submit any application. We only used the calculators on the public pages. Changing the inputs sends nothing to the sites’ servers: the calculation happens in the browser. So these are fixed formulas, not AI, and not a real loan decision.</p>
-    </section>
+        <div class="explain">
+          <div class="explain-block">
+            <h3>How it got this number</h3>
+            <div data-slot="steps"></div>
+          </div>
+          <div class="explain-block">
+            <h3>What’s behind this number</h3>
+            <ul data-slot="behind"></ul>
+          </div>
+          <div class="explain-block">
+            <h3>What it ignores</h3>
+            <ul data-slot="ignores"></ul>
+          </div>
+        </div>
+        <div class="sr-only" data-slot="announce" aria-live="polite" aria-atomic="true"></div>
+        <p class="next"><a href="#compare">See how the two calculators answer for the same people →</a></p>
+      </section>
 
-    <section id="limits" aria-labelledby="limits-h">
-      <h2 id="limits-h">Limits <span class="draft">[DRAFT]</span></h2>
-      <ul>
-        <li>Both sites call their results “indicative”. These are calculators, not loan offers. Real lenders also look at credit score, job, documents and more.</li>
-        <li>We tested two calculators on one day. Others may work differently, and these two may change at any time.</li>
-        <li>The rules match every case we tried, but we did not see the sites’ code. A rule could differ for inputs we didn’t try.</li>
-        <li>Bajaj asks for “monthly expenses” and Paisabazaar for “existing EMIs”. In the comparison we use the same number for both.</li>
-      </ul>
-    </section>
+      <!-- Tab 2: Paisabazaar -->
+      <section id="paisabazaar" class="tab" data-calc="paisabazaar" aria-labelledby="pb-h" hidden>
+        <div class="tab-head">
+          <h2 id="pb-h" tabindex="-1">Paisabazaar</h2>
+          <p class="kind">A loan marketplace. <a href="https://www.paisabazaar.com/personal-loan/eligibility-calculator/" rel="noopener noreferrer" target="_blank">Open the original calculator<span class="sr-only"> (opens in a new tab)</span></a></p>
+        </div>
 
-    <section id="data" aria-labelledby="data-h">
-      <h2 id="data-h">Data</h2>
-      <p>76 checks; our rules matched what the sites showed to within ₹1.</p>
-      <ul class="links">
-        <li><a href="checker_probes.csv" download>Download every check (checker_probes.csv)</a></li>
-        <li><a href="https://www.bajajfinserv.in/personal-loan-eligibility-calculator" rel="noopener noreferrer" target="_blank">Bajaj Finserv personal loan eligibility calculator<span class="sr-only"> (opens in a new tab)</span></a></li>
-        <li><a href="https://www.paisabazaar.com/personal-loan/eligibility-calculator/" rel="noopener noreferrer" target="_blank">Paisabazaar personal loan eligibility calculator<span class="sr-only"> (opens in a new tab)</span></a></li>
-      </ul>
-    </section>
-  </main>
+        <div class="calc">
+          <form class="inputs" id="form-pb" novalidate autocomplete="off">
+            <fieldset>
+              <legend>What this calculator asks for</legend>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="pb-age">Age</label>
+                  <div class="input"><input id="pb-age" type="text" inputmode="numeric" value="29" aria-describedby="pb-age-help pb-age-err"><span class="affix after" aria-hidden="true">years</span></div>
+                  <p class="help" id="pb-age-help" data-help="pb-age"></p>
+                  <p class="err" id="pb-age-err" aria-live="polite"></p>
+                </div>
+                <div class="field">
+                  <label for="pb-income">Monthly income (₹)</label>
+                  <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="pb-income" type="text" inputmode="numeric" value="40,000" data-kind="money" aria-describedby="pb-income-help pb-income-err"></div>
+                  <p class="help" id="pb-income-help" data-help="pb-income"></p>
+                  <p class="err" id="pb-income-err" aria-live="polite"></p>
+                </div>
+                <div class="field">
+                  <label for="pb-emi">Monthly EMIs you already pay (₹)</label>
+                  <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="pb-emi" type="text" inputmode="numeric" value="10,000" data-kind="money" aria-describedby="pb-emi-help pb-emi-err"></div>
+                  <p class="help" id="pb-emi-help" data-help="pb-emi"></p>
+                  <p class="err" id="pb-emi-err" aria-live="polite"></p>
+                </div>
+                <div class="field">
+                  <label for="pb-desired">Loan amount you want (₹)</label>
+                  <div class="input money"><span class="affix" aria-hidden="true">₹</span><input id="pb-desired" type="text" inputmode="numeric" value="20,00,000" data-kind="money" aria-describedby="pb-desired-help pb-desired-err"></div>
+                  <p class="help" id="pb-desired-help" data-help="pb-desired"></p>
+                  <p class="err" id="pb-desired-err" aria-live="polite"></p>
+                </div>
+                <div class="field">
+                  <label for="pb-rate">Yearly interest rate (%)</label>
+                  <div class="input"><input id="pb-rate" type="text" inputmode="decimal" value="10" data-kind="decimal" aria-describedby="pb-rate-help pb-rate-err"><span class="affix after" aria-hidden="true">% a year</span></div>
+                  <p class="help" id="pb-rate-help" data-help="pb-rate"></p>
+                  <p class="err" id="pb-rate-err" aria-live="polite"></p>
+                </div>
+                <div class="field">
+                  <label for="pb-tenure">Loan tenure (years, 1–10)</label>
+                  <div class="input"><input id="pb-tenure" type="text" inputmode="numeric" value="5" aria-describedby="pb-tenure-help pb-tenure-err"><span class="affix after" aria-hidden="true">years</span></div>
+                  <p class="help" id="pb-tenure-help" data-help="pb-tenure"></p>
+                  <p class="err" id="pb-tenure-err" aria-live="polite"></p>
+                </div>
+              </div>
+            </fieldset>
+          </form>
 
-  <footer class="foot wrap">
-    <p>Not financial advice.</p>
-    <p>Nothing you type here leaves your browser.</p>
-    <p>Contact: [to be added]</p>
-  </footer>
+          <div class="result">
+            <div class="shows" data-slot="shows"></div>
+            <div class="notices" data-slot="notices"></div>
+          </div>
+        </div>
+
+        <div class="explain">
+          <div class="explain-block">
+            <h3>How it got this number</h3>
+            <div data-slot="steps"></div>
+          </div>
+          <div class="explain-block">
+            <h3>What’s behind this number</h3>
+            <ul data-slot="behind"></ul>
+          </div>
+          <div class="explain-block">
+            <h3>What it ignores</h3>
+            <ul data-slot="ignores"></ul>
+          </div>
+        </div>
+        <div class="sr-only" data-slot="announce" aria-live="polite" aria-atomic="true"></div>
+        <p class="next"><a href="#compare">See how the two calculators answer for the same people →</a></p>
+      </section>
+
+      <!-- Tab 3: Compare & findings -->
+      <section id="compare" class="tab" aria-labelledby="compare-h" hidden>
+        <div class="tab-head">
+          <h2 id="compare-h" tabindex="-1">Compare &amp; findings</h2>
+          <p class="kind">Two popular loan-eligibility calculators give the same person very different answers. Here is what each one assumes.</p>
+        </div>
+
+        <section class="block" aria-labelledby="examples-h">
+          <h3 id="examples-h">Four example people</h3>
+          <p class="intro">Same person, different “You are eligible” (5-year loan). Every amount below was seen on the sites, except one cell marked <em>rule</em>.</p>
+          <table class="examples">
+            <thead>
+              <tr>
+                <th scope="col">Person</th>
+                <th scope="col">Bajaj</th>
+                <th scope="col">Paisabazaar at 10%</th>
+                <th scope="col">Paisabazaar at 20%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">A: 29, ₹40k income, ₹10k EMIs</th>
+                <td data-label="Bajaj" data-check="bajaj 40000 10000">₹4,00,000</td>
+                <td data-label="Paisabazaar at 10%" data-check="pb 29 2000000 10 5 40000 10000">₹5,64,784</td>
+                <td data-label="Paisabazaar at 20%" data-check="pb 29 2000000 20 5 40000 10000">₹4,52,935</td>
+              </tr>
+              <tr>
+                <th scope="row">B: 29, ₹40k income, no EMIs</th>
+                <td data-label="Bajaj" data-check="bajaj 40000 0">₹4,00,000</td>
+                <td data-label="Paisabazaar at 10%" data-check="pb 29 2000000 10 5 40000 0">₹9,60,000</td>
+                <td data-label="Paisabazaar at 20%" data-check="pb 29 2000000 20 5 40000 0">₹8,30,380</td>
+              </tr>
+              <tr>
+                <th scope="row">C: 35, ₹60k income, ₹35k EMIs</th>
+                <td data-label="Bajaj" data-check="bajaj 60000 35000">₹4,70,654</td>
+                <td data-label="Paisabazaar at 10%" data-check="pb 35 2000000 10 5 60000 35000">not eligible (debts too high)</td>
+                <td data-label="Paisabazaar at 20%" data-check="pb 35 2000000 20 5 60000 35000" data-rule="true">not eligible (<em>rule</em>: the debt check doesn’t use the rate)</td>
+              </tr>
+              <tr>
+                <th scope="row">D: 59, ₹80k income, no EMIs</th>
+                <td data-label="Bajaj" data-check="bajaj 80000 0">₹8,00,000</td>
+                <td data-label="Paisabazaar at 10%" data-check="pb 59 2000000 10 5 80000 0">₹5,00,478 (tenure cut to 1 year)</td>
+                <td data-label="Paisabazaar at 20%" data-check="pb 59 2000000 20 5 80000 0">₹4,74,985 (tenure cut to 1 year)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note small">(Bajaj asks for “expenses” and Paisabazaar for “existing EMIs”. In this table both are the person’s EMIs.)</p>
+        </section>
+
+        <section class="block" aria-labelledby="findings-h">
+          <h3 id="findings-h">What we found</h3>
+          <ul class="findings">
+            <li><strong>Not AI, just fixed formulas.</strong> Each calculator follows one fixed formula, and it runs in your browser: changing the inputs sends nothing to the sites’ servers.</li>
+            <li><strong>No credit score.</strong> Neither calculator asks for a credit score or any credit history, though both word the result as <em>your</em> eligibility.</li>
+            <li><strong>The assumptions are not shown next to the result.</strong> Bajaj assumes a yearly interest rate of 10% over 5 years, and that up to 75% of income can go to monthly instalments plus expenses. Paisabazaar assumes up to 55% of income can go to monthly instalments, and caps the loan at 24 × monthly income. Neither result says so.</li>
+            <li><strong>City makes no difference.</strong> Bajaj requires a city, but any city, even a made-up one (“Xyzabc”), gives the same amount.</li>
+            <li><strong>Tenure is silently capped.</strong> Paisabazaar’s tenure slider goes to 10 years, but it never uses more than 5. Choose 6 or 7 and it shows “Eligible Tenure 5 Years”.</li>
+            <li><strong>“Eligible” for ₹47.</strong> Both calculators say “You are eligible” for as little as ₹47, when only ₹1 a month of room is left. Bajaj also says “You are eligible for a personal loan upto ₹0”.</li>
+            <li><strong>The page names inputs it doesn’t ask for.</strong> Paisabazaar’s page says it estimates “based on your income, employment type, monthly expenses and more”. The calculator asks for neither employment type nor monthly expenses.</li>
+          </ul>
+        </section>
+
+        <section class="block" aria-labelledby="method-h">
+          <h3 id="method-h">How we tested <span class="draft">[DRAFT]</span></h3>
+          <p>On 14 November 2026 we opened each calculator in a normal web browser. We typed in different values (income, expenses or EMIs, age, interest rate, tenure), usually changing one thing at a time, and wrote down what the calculator showed. From these input–output pairs we worked out the rule each calculator follows. We then tested each rule on inputs we had not used to build it. Across 76 checks, the rules matched what the sites showed to within ₹1 of rounding.</p>
+          <p>We did not log in, enter a PAN, phone number or OTP, or submit any application. We only used the calculators on the public pages. Changing the inputs sends nothing to the sites’ servers: the calculation happens in the browser. So these are fixed formulas, not AI, and not a real loan decision.</p>
+        </section>
+
+        <section class="block" aria-labelledby="limits-h">
+          <h3 id="limits-h">Limits <span class="draft">[DRAFT]</span></h3>
+          <ul>
+            <li>Both sites call their results “indicative”. These are calculators, not loan offers. Real lenders also look at credit score, job, documents and more.</li>
+            <li>We tested two calculators on one day. Others may work differently, and these two may change at any time.</li>
+            <li>The rules match every case we tried, but we did not see the sites’ code. A rule could differ for inputs we didn’t try.</li>
+            <li>Bajaj asks for “monthly expenses” and Paisabazaar for “existing EMIs”. In the comparison we use the same number for both.</li>
+          </ul>
+        </section>
+
+        <section class="block" aria-labelledby="data-h">
+          <h3 id="data-h">Data</h3>
+          <p>76 checks; our rules matched what the sites showed to within ₹1.</p>
+          <ul class="links">
+            <li><a href="checker_probes.csv" download>Download every check (checker_probes.csv)</a></li>
+            <li><a href="https://www.bajajfinserv.in/personal-loan-eligibility-calculator" rel="noopener noreferrer" target="_blank">Bajaj Finserv personal loan eligibility calculator<span class="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a href="https://www.paisabazaar.com/personal-loan/eligibility-calculator/" rel="noopener noreferrer" target="_blank">Paisabazaar personal loan eligibility calculator<span class="sr-only"> (opens in a new tab)</span></a></li>
+          </ul>
+        </section>
+      </section>
+    </main>
+
+    <footer class="foot wrap">
+      <p>Not financial advice.</p>
+      <p>Nothing you type here leaves your browser.</p>
+      <p>Contact: [to be added]</p>
+    </footer>
+  </div>
 </body>
 </html>
