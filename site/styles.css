@@ -14,29 +14,32 @@
   --notice-line: #c99a1a;
   --notice-ink: #4a3500;
   --error: #a3261b;
-  --diff-bg: #1b1b19;
-  --diff-ink: #f6f5f1;
+  --accent: #1b1b19;      /* active tab, main button */
+  --on-accent: #f6f5f1;   /* text on --accent */
+  --quote-line: #8a887f;  /* bar beside "The page would show" */
   --radius: 10px;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
+  /* "Aubergine": deep plum background, lavender accent. */
   :root {
-    --bg: #141413;
-    --surface: #1d1d1b;
-    --ink: #edece6;
-    --muted: #b3b1a8;
-    --line: #3a3934;
-    --field: #262623;
-    --field-line: #8d8b82;
-    --focus: #8ab4ff;
-    --quote-bg: #2a2926;
-    --notice-bg: #3a2f10;
-    --notice-line: #b38a1e;
-    --notice-ink: #f4e2b0;
-    --error: #ff9b8f;
-    --diff-bg: #edece6;
-    --diff-ink: #141413;
+    --bg: #16121c;
+    --surface: #211a2a;
+    --ink: #eee8f4;
+    --muted: #b0a6bd;
+    --line: #3a2f4a;
+    --field: #2a2236;
+    --field-line: #8f84a0;
+    --focus: #c4a7ff;
+    --quote-bg: #2a2236;
+    --notice-bg: #2d2614;
+    --notice-line: #b8902a;
+    --notice-ink: #f1e0aa;
+    --error: #ff9fb0;
+    --accent: #c4a7ff;
+    --on-accent: #16121c;
+    --quote-line: #c4a7ff;
     color-scheme: dark;
   }
 }
@@ -121,8 +124,8 @@ button.primary {
   min-height: 52px;
   border: 0;
   border-radius: 10px;
-  background: var(--diff-bg);
-  color: var(--diff-ink);
+  background: var(--accent);
+  color: var(--on-accent);
   font: inherit;
   font-size: 1.05rem;
   font-weight: 600;
@@ -160,7 +163,7 @@ button.primary:hover { opacity: 0.92; }
 .tabs a:hover { color: var(--ink); }
 .tabs a[aria-current="page"] {
   color: var(--ink);
-  border-bottom-color: var(--ink);
+  border-bottom-color: var(--accent);
 }
 
 main { padding-top: 1.5rem; padding-bottom: 3rem; }
@@ -236,7 +239,7 @@ legend {
 .result { min-width: 0; }
 .shows {
   background: var(--quote-bg);
-  border-left: 4px solid var(--field-line);
+  border-left: 4px solid var(--quote-line);
   border-radius: 8px;
   padding: 1rem 1.1rem;
 }
