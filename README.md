@@ -1,0 +1,80 @@
+# Same person, different "You are eligible"
+
+A static, phone-friendly page comparing two Indian personal-loan eligibility
+calculators (Bajaj Finserv and Paisabazaar). It shows the different "You are
+eligible" answers each gives the same person, and the hidden assumptions behind
+each number. The rules were reconstructed from a black-box audit on
+14 November 2026.
+
+Live (unlisted) link: https://taitest-lilac.vercel.app
+
+## What's where
+
+| Folder | What it is |
+|---|---|
+| `site/` | The page itself: the only folder that gets published |
+| `site/rules.js` | The two calculator rules (ported from `reference/rules.py`) |
+| `data/` | Every probe from the audit, plus the live re-check of 14 Nov 2026 |
+| `reference/` | Audit notes and scripts (read-only reference) |
+| `tests/` | Automatic checks; run them with `npm test` |
+| `CLAUDE.md` | The project brief |
+
+## Run the checks
+
+```bash
+npm test
+```
+
+## Look at the page on your laptop
+
+```bash
+python3 -m http.server 8377 --directory site
+```
+
+Then open http://localhost:8377.
+
+## How publishing works
+
+The Vercel project `taitest` is connected to this GitHub repository.
+
+- **Push to `main` → the live link updates.** Vercel picks up every push to
+  `main` and publishes `site/` to https://taitest-lilac.vercel.app within
+  about a minute. Only push to `main` when the change is ready to be seen.
+- **Push to any other branch → a private preview.** Vercel builds it at its
+  own preview address, which asks for a Vercel login. Use this to try
+  changes first.
+- **Only `site/` is published.** The project's *Root Directory* is set to
+  `site` in Vercel. If it were empty, Vercel would publish the whole
+  repository, including this README, `CLAUDE.md`, `data/` and `reference/`.
+
+A safe way to make a change:
+
+```bash
+git switch -c my-change          # work on a branch
+# ...edit files...
+npm test                         # all checks must pass
+git commit -am "Describe the change"
+git push -u origin my-change     # private preview only
+# when happy: merge into main and push → live link updates
+git switch main && git merge my-change && git push
+```
+
+### One-time setup (already done once; here for reference)
+
+1. **Vercel → project `taitest` → Settings → Build and Deployment → Root
+   Directory:** `site` → Save. Do this *before* connecting the repository.
+2. **Vercel → Account Settings → Authentication:** connect the GitHub
+   account that owns this repository. On the free (Hobby) plan, pushes only
+   deploy when the Vercel account is linked to that GitHub account, and the
+   commit email is a verified email on it.
+3. **Vercel → project `taitest` → Settings → Git → Connect Git
+   Repository → GitHub.** When GitHub asks which repositories the Vercel
+   app may see, choose **Only select repositories** and pick this one.
+4. Push a commit to `main` and check the live link updated.
+
+### If a push doesn't update the live link
+
+- Vercel → project → **Deployments**: the newest one should show your commit
+  message. If it is missing, check step 2 above (linked GitHub account,
+  commit email).
+- `git config user.email` must be an email verified on the GitHub account.
