@@ -1,0 +1,334 @@
+/* Same person, different "You are eligible" — plain CSS, system fonts, no external requests. */
+
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1b1b19;
+  --muted: #55544e;
+  --line: #d9d7cf;
+  --field: #ffffff;
+  --field-line: #8a887f;
+  --focus: #1f5fbf;
+  --quote-bg: #efeee8;
+  --notice-bg: #fff3d1;
+  --notice-line: #c99a1a;
+  --notice-ink: #4a3500;
+  --error: #a3261b;
+  --diff-bg: #1b1b19;
+  --diff-ink: #f6f5f1;
+  --radius: 10px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141413;
+    --surface: #1d1d1b;
+    --ink: #edece6;
+    --muted: #b3b1a8;
+    --line: #3a3934;
+    --field: #262623;
+    --field-line: #8d8b82;
+    --focus: #8ab4ff;
+    --quote-bg: #2a2926;
+    --notice-bg: #3a2f10;
+    --notice-line: #b38a1e;
+    --notice-ink: #f4e2b0;
+    --error: #ff9b8f;
+    --diff-bg: #edece6;
+    --diff-ink: #141413;
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.wrap {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+h1, h2, h3, h4 { line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 0.95rem; margin: 1.25rem 0 0.4rem; }
+
+p { margin: 0 0 0.75rem; }
+ul { margin: 0; padding-left: 1.2rem; }
+li { margin-bottom: 0.4rem; }
+q { quotes: "“" "”"; }
+
+a { color: inherit; text-underline-offset: 0.18em; }
+a:focus-visible, input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.muted { color: var(--muted); }
+.small { font-size: 0.875rem; }
+
+/* --- Top ------------------------------------------------------------------ */
+.top { padding-top: 2rem; padding-bottom: 1.5rem; }
+.lede { font-size: 1.125rem; margin-top: 0.75rem; max-width: 40rem; }
+.stamp {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+}
+
+main { padding-bottom: 3rem; }
+.intro { color: var(--muted); }
+
+/* --- Form ----------------------------------------------------------------- */
+.person {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+fieldset {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.75rem 1rem 0.25rem;
+  min-width: 0;
+}
+legend {
+  font-weight: 600;
+  padding: 0 0.35rem;
+  margin-left: -0.35rem;
+}
+
+.field { margin-bottom: 0.9rem; }
+.field label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
+
+.input {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+  background: var(--field);
+  overflow: hidden;
+}
+.input:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.input input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.125rem; /* ≥16px so phones do not zoom */
+  font-variant-numeric: tabular-nums;
+  padding: 0.5rem 0.75rem;
+}
+.input input:focus-visible { outline: none; }
+.input input[aria-invalid="true"] { color: var(--error); }
+.input:has(input[aria-invalid="true"]) { border-color: var(--error); }
+.affix {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.affix.after { padding: 0 0.75rem 0 0; }
+.money input { padding-left: 0.35rem; }
+
+.help { font-size: 0.875rem; color: var(--muted); margin: 0.3rem 0 0; }
+.err { font-size: 0.875rem; color: var(--error); font-weight: 600; margin: 0.2rem 0 0; }
+.err:empty { display: none; }
+.note { color: var(--muted); }
+
+/* --- Cards ---------------------------------------------------------------- */
+.cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  min-width: 0;
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  margin-bottom: 0.75rem;
+}
+.card-head a { display: inline-block; padding: 0.25rem 0; }
+.kind { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* "What the page would show": a neutral quotation of the site's wording. */
+.shows {
+  background: var(--quote-bg);
+  border-left: 4px solid var(--field-line);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  min-height: 7.5rem;
+}
+.shows p { margin-bottom: 0.25rem; }
+.shows-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.site-text { font-size: 1.05rem; }
+.amount {
+  font-size: clamp(1.8rem, 8vw, 2.4rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.site-error { font-weight: 600; color: var(--error); }
+
+.site-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+.site-facts dt { color: var(--muted); }
+.site-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.notices:not(:empty) { margin-top: 0.75rem; }
+.notice {
+  background: var(--notice-bg);
+  color: var(--notice-ink);
+  border-left: 4px solid var(--notice-line);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.925rem;
+  margin-bottom: 0.5rem;
+}
+
+.steps:not(:empty) {
+  margin-top: 0.75rem;
+  border-top: 1px dashed var(--line);
+  padding-top: 0.6rem;
+}
+.steps p { margin-bottom: 0.25rem; font-size: 0.95rem; }
+.steps-label { font-weight: 600; font-size: 0.85rem !important; color: var(--muted); }
+
+/* --- Difference ----------------------------------------------------------- */
+.difference {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  background: var(--diff-bg);
+  color: var(--diff-ink);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* --- Later sections -------------------------------------------------------- */
+main > section + section { margin-top: 3rem; }
+
+.examples {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-variant-numeric: tabular-nums;
+}
+.examples th, .examples td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.examples thead th {
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-bottom: 2px solid var(--line);
+}
+.examples tbody th { font-weight: 600; }
+.examples td[data-rule] { color: var(--muted); }
+
+/* Phone: one block per person, each value labelled. */
+@media (max-width: 639px) {
+  .examples thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .examples, .examples tbody, .examples tr, .examples th, .examples td { display: block; }
+  .examples tr {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+  }
+  .examples th, .examples td { border-bottom: 0; padding: 0.35rem 0.9rem; }
+  .examples tbody th { padding-top: 0.6rem; }
+  .examples td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+}
+
+.findings li { margin-bottom: 0.75rem; }
+
+.draft {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--notice-ink);
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-line);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+}
+h2 { margin-bottom: 0.75rem; }
+
+.links { list-style: none; padding: 0; }
+.links li { margin-bottom: 0.25rem; }
+.links a { display: inline-block; padding: 0.6rem 0; } /* comfortable tap targets */
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+  padding-bottom: 2.5rem;
+  color: var(--muted);
+  font-size: 0.925rem;
+}
+.foot p { margin-bottom: 0.3rem; }
+
+/* --- Wider screens -------------------------------------------------------- */
+@media (min-width: 640px) {
+  .person { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+@media (min-width: 800px) {
+  .cards { grid-template-columns: 1fr 1fr; align-items: start; }
+}

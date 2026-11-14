@@ -1,0 +1,79 @@
+site,probe_type,age,city,monthly_income,monthly_expense_or_existing_emi,desired_amount,rate_pct,tenure_years_chosen,shown_eligible_amount,shown_tenure_years,shown_message,rule_prediction,match
+bajaj_finserv,grid,,Pune,50000,10000,,,,500000,,,500000,yes
+bajaj_finserv,grid,,Pune,30000,10000,,,,300000,,,300000,yes
+bajaj_finserv,grid,,Pune,30000,0,,,,300000,,,300000,yes
+bajaj_finserv,grid,,Pune,100000,10000,,,,1000000,,,1000000,yes
+bajaj_finserv,grid,,Pune,100000,50000,,,,1000000,,,1000000,yes
+bajaj_finserv,grid,,Pune,100000,55000,,,,941307,,,941307,yes
+bajaj_finserv,grid,,Pune,100000,60000,,,,705981,,,705981,yes
+bajaj_finserv,grid,,Pune,100000,65000,,,,470654,,,470654,yes
+bajaj_finserv,grid,,Pune,100000,70000,,,,235327,,,235327,yes
+bajaj_finserv,boundary,,Pune,100000,74999,,,,47,,,47,yes
+bajaj_finserv,grid,,Pune,100000,75000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,100000,80000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,100000,85000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,100000,90000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,100000,100000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,100000,150000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,50000,15000,,,,500000,,,500000,yes
+bajaj_finserv,grid,,Pune,50000,20000,,,,500000,,,500000,yes
+bajaj_finserv,grid,,Pune,50000,25000,,,,500000,,,500000,yes
+bajaj_finserv,grid,,Pune,50000,30000,,,,352990,,,352990,yes
+bajaj_finserv,grid,,Pune,50000,35000,,,,117663,,,117663,yes
+bajaj_finserv,grid,,Pune,50000,40000,,,,0,,,0,yes
+bajaj_finserv,grid,,Pune,25000,24000,,,,0,,,0,yes
+bajaj_finserv,limit,,Pune,20000,0,,,,,,Minimum allowed value is Rs 25000,,
+bajaj_finserv,grid,,Pune,37500,0,,,,375000,,,375000,yes
+bajaj_finserv,grid,,Pune,61234,0,,,,612340,,,612340,yes
+bajaj_finserv,grid,,Pune,1000000,0,,,,10000000,,,10000000,yes
+bajaj_finserv,limit,,Pune,2000000,0,,,,,,Maximum allowed value is Rs 10 Lakhs,,
+bajaj_finserv,city,,Delhi,60000,30000,,,,600000,,,600000,yes
+bajaj_finserv,city,,Patna,60000,30000,,,,600000,,,600000,yes
+bajaj_finserv,city,,Gorakhpur,60000,30000,,,,600000,,,600000,yes
+bajaj_finserv,city,,Xyzabc (made-up),60000,30000,,,,600000,,,600000,yes
+bajaj_finserv,holdout,,Pune,43210,12345,,,,432100,,,432100,yes
+bajaj_finserv,holdout,,Pune,43210,25000,,,,348637,,,348637,yes
+bajaj_finserv,holdout,,Pune,78900,51234,,,,373746,,,373746,yes
+bajaj_finserv,holdout,,Pune,250000,170000,,,,823644,,,823644,yes
+bajaj_finserv,holdout,,Pune,333333,0,,,,3333330,,,3333330,yes
+bajaj_finserv,holdout,,Pune,27500,19000,,,,76481,,,76481,yes
+paisabazaar,grid,29,,40000,10000,200000,10,3,200000,3,,200000,yes
+paisabazaar,grid,29,,40000,10000,2000000,10,3,371895,3,,371895,yes
+paisabazaar,grid,29,,40000,10000,2000000,10,5,564784,5,,564784,yes
+paisabazaar,grid,29,,40000,10000,2000000,20,5,452935,5,,452935,yes
+paisabazaar,grid,29,,40000,0,2000000,10,5,960000,5,,960000,yes
+paisabazaar,grid,29,,80000,0,2000000,10,5,1920000,5,,1920000,yes
+paisabazaar,grid,55,,80000,0,2000000,10,5,1920000,5,,1920000,yes
+paisabazaar,age,58,,80000,0,2000000,10,10,953518,2,,953518,yes
+paisabazaar,age,60,,80000,0,2000000,10,5,,,not eligible: would exceed maximum permissible age on maturity,not eligible: age at maturity,yes
+paisabazaar,age,60,,80000,0,2000000,10,10,,,not eligible: would exceed maximum permissible age on maturity,not eligible: age at maturity,yes
+paisabazaar,age,61,,80000,0,2000000,10,10,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,63,,80000,0,2000000,10,5,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,64,,80000,0,2000000,10,5,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,65,,80000,0,2000000,10,5,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,66,,80000,0,2000000,10,5,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,68,,80000,0,2000000,10,1,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,68,,80000,0,2000000,10,2,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,68,,80000,0,2000000,10,5,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,age,70,,80000,0,2000000,10,1,,,not eligible: age higher than maximum allowed,not eligible: age above maximum,yes
+paisabazaar,holdout,33,,57000,7000,3000000,14,4,891077,4,,891077,yes
+paisabazaar,holdout,41,,35000,15000,500000,18,3,117558,3,,117558,yes
+paisabazaar,holdout,26,,120000,30000,4000000,12,6,1618381,5,,1618381,yes (after adding 5-year tenure cap)
+paisabazaar,holdout,57,,65000,5000,1500000,11,7,939255,3,,939255,yes
+paisabazaar,holdout,45,,25000,12000,800000,25,2,32789,2,,32789,yes
+bajaj_finserv,verify,,Pune,40000,10000,,,,400000,,,400000,yes
+bajaj_finserv,verify,,Pune,40000,0,,,,400000,,,400000,yes
+bajaj_finserv,verify,,Pune,80000,0,,,,800000,,,800000,yes
+bajaj_finserv,verify,,Pune,60000,35000,,,,470654,,,470654,yes
+bajaj_finserv,verify,,Pune,100000,40000,,,,1000000,,,1000000,yes
+paisabazaar,verify,29,,40000,0,2000000,20,5,830380,5,,830380,yes
+paisabazaar,verify,59,,80000,0,2000000,10,5,500478,1,,500478,yes
+paisabazaar,verify,59,,80000,0,2000000,20,5,474985,1,,474985,yes
+paisabazaar,verify,35,,100000,40000,2000000,10,5,705981,5,,705981,yes
+paisabazaar,debt,35,,60000,35000,2000000,10,5,,,not eligible: existing debts on current income higher than permissible limit,not eligible: existing debts too high,yes
+paisabazaar,debt,35,,60000,33000,2000000,10,5,,,not eligible: existing debts on current income higher than permissible limit,not eligible: existing debts too high,yes
+paisabazaar,debt,35,,60000,50000,2000000,10,5,,,not eligible: existing debts on current income higher than permissible limit,not eligible: existing debts too high,yes
+paisabazaar,debt,35,,60000,32000,2000000,10,5,47065,5,,47065,yes
+paisabazaar,debt,35,,60000,32900,2000000,10,5,4707,5,,4707,yes
+paisabazaar,debt,35,,60000,32990,2000000,10,5,471,5,,471,yes
+paisabazaar,debt,35,,60000,32999,2000000,10,5,47,5,,47,yes

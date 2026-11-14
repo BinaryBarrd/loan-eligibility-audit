@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Vercel project link (created by `npx vercel`; holds project/team IDs)
+.vercel
+
+# API keys for the chatbot audit, if you ever keep them in a file
+.env
+.env.*
+
+# Tools
+node_modules/
+__pycache__/
+*.pyc
