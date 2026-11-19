@@ -36,7 +36,8 @@ test('every page is unlisted, has no external resources, and has the footer', ()
       assert.ok(!/^https?:|^\/\//.test(url), `${f}: external resource ${url}`);
     }
     const text = visibleText(s);
-    for (const line of ['Not financial advice.', 'Nothing you type here leaves your browser.', 'Contact: [to be added]']) {
+    assert.ok(!text.includes('Contact:'), `${f}: no contact placeholder`);
+    for (const line of ['Not financial advice.', 'Nothing you type here leaves your browser.']) {
       assert.ok(text.includes(line), `${f}: ${line}`);
     }
   }
@@ -87,9 +88,20 @@ test('overview: disclaimer first, with a continue button; the rest starts hidden
 test('every page links every page, and marks itself as current', () => {
   for (const f of HTML_FILES) {
     const s = html(f);
-    for (const g of HTML_FILES) assert.ok(s.includes(`<a href="${g}"`), `${f} links ${g}`);
-    assert.ok(s.includes(`<a href="${f}" aria-current="page">`), `${f} marks itself`);
+    for (const g of HTML_FILES) assert.match(s, new RegExp(`<a href="${g}(#overview)?"`), `${f} links ${g}`);
+    assert.match(s, new RegExp(`<a href="${f}(#overview)?" aria-current="page">`), `${f} marks itself`);
     if (f !== 'index.html') assert.match(visibleText(s), /Not financial advice\. Calculators, not loan offers\./, `${f}: strip`);
+  }
+});
+
+test('every page preloads every module it uses, so they download in parallel', () => {
+  const imports = (f) => [...read(`../site/${f}`).matchAll(/^import[^;]*?from\s+'\.\/([^']+)'/gm)].map((m) => m[1]);
+  for (const f of HTML_FILES) {
+    const s = html(f);
+    const entry = s.match(/<script type="module" src="([^"]+)">/)[1];
+    const need = new Set([entry]); const todo = [entry];
+    while (todo.length) for (const m of imports(todo.pop())) if (!need.has(m)) { need.add(m); todo.push(m); }
+    for (const m of need) assert.ok(s.includes(`<link rel="modulepreload" href="${m}">`), `${f}: preload ${m}`);
   }
 });
 

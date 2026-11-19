@@ -9,18 +9,25 @@
   <meta name="description" content="Nine Indian personal-loan eligibility calculators give the same person very different answers. Here is the rule behind each one.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
+  <link rel="modulepreload" href="compare.js">
+  <link rel="modulepreload" href="platforms.js">
+  <link rel="modulepreload" href="people.js">
+  <link rel="modulepreload" href="audit-data.js">
+  <link rel="modulepreload" href="common.js">
+  <link rel="modulepreload" href="fmt.js">
+  <link rel="modulepreload" href="rules.js">
   <script type="module" src="compare.js"></script>
 </head>
 <body>
   <div id="app">
     <header class="top">
       <div class="wrap">
-        <p class="site-title"><a href="index.html">Same person, different “You are eligible”</a></p>
+        <p class="site-title"><a href="index.html#overview">Same person, different “You are eligible”</a></p>
         <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
       </div>
       <nav class="tabs" aria-label="Pages">
         <div class="wrap tabs-inner scroll">
-          <a href="index.html">Overview</a>
+          <a href="index.html#overview">Overview</a>
           <a href="bajaj-finserv.html">Bajaj Finserv</a>
           <a href="paisabazaar.html">Paisabazaar</a>
           <a href="kotak.html">Kotak</a>
@@ -38,7 +45,13 @@
     <div class="strip"><div class="wrap"><p><strong>Not financial advice.</strong> Calculators, not loan offers. Results here are recreated from rules worked out by testing the public pages; not made by, or connected to, any of these companies. Nothing you type here leaves your browser.</p></div></div>
     <main class="wrap" id="main">
       <h1 tabindex="-1">Compare all nine</h1>
-      <p class="lede">Type one person’s details. Each calculator gets them in its own boxes, as noted on the right of each row.</p>
+      <p class="lede">Type one person’s details once. The calculators ask for different things, so each one gets only what it asks for, in its own boxes. Under each name you can see exactly what it was given.</p>
+      <ul class="small muted">
+        <li>Calculators with one “expenses” box (Bajaj Finserv, Axis, Fibe, Aditya Birla) get your EMIs plus other expenses.</li>
+        <li>Calculators that ask only for EMIs (Paisabazaar, Kotak, SMFG, Poonawalla) get your EMIs; other expenses are left out.</li>
+        <li>IDFC FIRST gets EMIs as EMIs and other expenses as “utilities”. Age is used only by Paisabazaar; rate and tenure only where a calculator asks.</li>
+        <li>If a value is outside a calculator’s own range, it says so instead of guessing.</li>
+      </ul>
       <form class="inputs" id="compare-form" novalidate autocomplete="off">
         <fieldset>
           <legend>One person</legend>
@@ -83,7 +96,7 @@
       <section class="section" aria-labelledby="one-h">
         <h3 id="one-h">What each page would show</h3>
         <div class="table-scroll"><table class="wide">
-          <thead><tr><th scope="col">Calculator</th><th scope="col">Shows</th><th scope="col">How the person was entered</th></tr></thead>
+          <thead><tr><th scope="col">Calculator, and what it was given</th><th scope="col">Shows</th></tr></thead>
           <tbody id="one-body"></tbody>
         </table></div>
         <p id="one-spread"></p>
@@ -102,7 +115,6 @@
     <footer class="foot wrap">
       <p>Not financial advice.</p>
       <p>Nothing you type here leaves your browser.</p>
-      <p>Contact: [to be added]</p>
     </footer>
   </div>
 </body>

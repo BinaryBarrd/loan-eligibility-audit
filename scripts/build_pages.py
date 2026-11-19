@@ -2,6 +2,7 @@
 The content is filled in by the page's script from rules.js, platforms.js and audit-data.js.
 Run from the TAI377 folder: python3 scripts/build_pages.py
 """
+import re
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent / "site"
@@ -17,10 +18,23 @@ PLATFORMS = [  # (file, id, short name for the menu) in the order of platforms.j
     ("aditya-birla-capital.html", "aditya_birla", "Aditya Birla"),
 ]
 TITLE = "Same person, different “You are eligible”"
-MENU = [("index.html", "Overview")] + [(f, n) for f, _, n in PLATFORMS] + [("compare.html", "Compare"), ("method.html", "Method")]
+MENU = [("index.html#overview", "Overview")] + [(f, n) for f, _, n in PLATFORMS] + [("compare.html", "Compare"), ("method.html", "Method")]
+
+
+def module_graph(script):
+    """Every module the page script imports, directly or through other modules."""
+    seen, todo = [], [script]
+    while todo:
+        f = todo.pop(0)
+        if f in seen:
+            continue
+        seen.append(f)
+        todo += re.findall(r"^import[^;]*?from\s+'\./([^']+)'", (SITE / f).read_text(encoding="utf-8"), re.M)
+    return seen
 
 
 def head(title, script, desc):
+    preload = "\n".join(f'  <link rel="modulepreload" href="{m}">' for m in module_graph(script))
     return f"""<!doctype html>
 <html lang="en-IN">
 <head>
@@ -32,6 +46,7 @@ def head(title, script, desc):
   <meta name="description" content="{desc}">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
+{preload}
   <script type="module" src="{script}"></script>
 </head>
 """
@@ -39,10 +54,10 @@ def head(title, script, desc):
 
 def header(current):
     links = "\n".join(
-        f'          <a href="{f}"{" aria-current=\"page\"" if f == current else ""}>{n}</a>' for f, n in MENU)
+        f'          <a href="{f}"{" aria-current=\"page\"" if f.split("#")[0] == current else ""}>{n}</a>' for f, n in MENU)
     return f"""    <header class="top">
       <div class="wrap">
-        <p class="site-title"><a href="index.html">{TITLE}</a></p>
+        <p class="site-title"><a href="index.html#overview">{TITLE}</a></p>
         <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
       </div>
       <nav class="tabs" aria-label="Pages">
@@ -59,7 +74,6 @@ STRIP = """    <div class="strip"><div class="wrap"><p><strong>Not financial adv
 FOOT = """    <footer class="foot wrap">
       <p>Not financial advice.</p>
       <p>Nothing you type here leaves your browser.</p>
-      <p>Contact: [to be added]</p>
     </footer>
 """
 NOSCRIPT = '<noscript><p class="notice">This page needs JavaScript to show the calculators.</p></noscript>'
@@ -133,7 +147,13 @@ def field(key, label, value, unit=None, money=False, decimal=False):
 
 COMPARE = f"""    <main class="wrap" id="main">
       <h1 tabindex="-1">Compare all nine</h1>
-      <p class="lede">Type one person’s details. Each calculator gets them in its own boxes, as noted on the right of each row.</p>
+      <p class="lede">Type one person’s details once. The calculators ask for different things, so each one gets only what it asks for, in its own boxes. Under each name you can see exactly what it was given.</p>
+      <ul class="small muted">
+        <li>Calculators with one “expenses” box (Bajaj Finserv, Axis, Fibe, Aditya Birla) get your EMIs plus other expenses.</li>
+        <li>Calculators that ask only for EMIs (Paisabazaar, Kotak, SMFG, Poonawalla) get your EMIs; other expenses are left out.</li>
+        <li>IDFC FIRST gets EMIs as EMIs and other expenses as “utilities”. Age is used only by Paisabazaar; rate and tenure only where a calculator asks.</li>
+        <li>If a value is outside a calculator’s own range, it says so instead of guessing.</li>
+      </ul>
       <form class="inputs" id="compare-form" novalidate autocomplete="off">
         <fieldset>
           <legend>One person</legend>
@@ -148,7 +168,7 @@ COMPARE = f"""    <main class="wrap" id="main">
       <section class="section" aria-labelledby="one-h">
         <h3 id="one-h">What each page would show</h3>
         <div class="table-scroll"><table class="wide">
-          <thead><tr><th scope="col">Calculator</th><th scope="col">Shows</th><th scope="col">How the person was entered</th></tr></thead>
+          <thead><tr><th scope="col">Calculator, and what it was given</th><th scope="col">Shows</th></tr></thead>
           <tbody id="one-body"></tbody>
         </table></div>
         <p id="one-spread"></p>

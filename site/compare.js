@@ -34,9 +34,9 @@ function render() {
   const rows = everyone(x);
   const amounts = rows.filter((r) => r.amount !== null && r.amount > 0).map((r) => r.amount);
   $('one-body').replaceChildren(...rows.map(({ p, result, notes }) => h('tr', {},
-    h('th', { scope: 'row' }, h('a', { href: p.file }, p.name)),
-    h('td', {}, shown(result)),
-    h('td', { class: 'muted' }, [`${MAPPING_NOTE[p.id]}.`, ...notes, ...result.notices].join(' ')))));
+    h('th', { scope: 'row', class: 'wrap-cell' }, h('a', { href: p.file }, p.name),
+      h('span', { class: 'given' }, [`${MAPPING_NOTE[p.id]}.`, ...notes, ...result.notices].join(' '))),
+    h('td', { class: 'num' }, shown(result)))));
   $('one-spread').textContent = amounts.length > 1
     ? `For this person: smallest non-zero amount ${rs(Math.min(...amounts))}, largest ${rs(Math.max(...amounts))}.` : '';
 }

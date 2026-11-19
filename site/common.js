@@ -26,10 +26,11 @@ export function readField(el) {
   return { value: Number(cleaned), error: '' };
 }
 
-/** Disclaimer gate (front page only). Nothing is stored: it shows on every visit. */
+/** Disclaimer gate (front page only). Nothing is stored: it shows on every arrival from outside; the menu links (#overview) skip it. */
 export function gate() {
   const d = $('disclaimer'); const app = $('app');
   if (!d || !app) return;
+  if (location.hash === '#overview') { d.hidden = true; app.hidden = false; return; } // coming from another page of this site
   $('continue').addEventListener('click', () => {
     d.hidden = true; app.hidden = false; window.scrollTo(0, 0);
     app.querySelector('h1, h2')?.focus({ preventScroll: true });

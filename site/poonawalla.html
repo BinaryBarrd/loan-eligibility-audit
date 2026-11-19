@@ -9,18 +9,24 @@
   <meta name="description" content="The rule behind the Poonawalla personal-loan eligibility calculator, and what a black-box audit found.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
+  <link rel="modulepreload" href="platform.js">
+  <link rel="modulepreload" href="platforms.js">
+  <link rel="modulepreload" href="common.js">
+  <link rel="modulepreload" href="fmt.js">
+  <link rel="modulepreload" href="rules.js">
+  <link rel="modulepreload" href="audit-data.js">
   <script type="module" src="platform.js"></script>
 </head>
 <body data-platform="poonawalla">
   <div id="app">
     <header class="top">
       <div class="wrap">
-        <p class="site-title"><a href="index.html">Same person, different “You are eligible”</a></p>
+        <p class="site-title"><a href="index.html#overview">Same person, different “You are eligible”</a></p>
         <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
       </div>
       <nav class="tabs" aria-label="Pages">
         <div class="wrap tabs-inner scroll">
-          <a href="index.html">Overview</a>
+          <a href="index.html#overview">Overview</a>
           <a href="bajaj-finserv.html">Bajaj Finserv</a>
           <a href="paisabazaar.html">Paisabazaar</a>
           <a href="kotak.html">Kotak</a>
@@ -42,7 +48,6 @@
     <footer class="foot wrap">
       <p>Not financial advice.</p>
       <p>Nothing you type here leaves your browser.</p>
-      <p>Contact: [to be added]</p>
     </footer>
   </div>
 </body>

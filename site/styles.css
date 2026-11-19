@@ -441,3 +441,5 @@ legend {
 @media (min-width: 960px) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .explain-block h2.h3, h2.h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
 h1:focus { outline: none; }
+.given { display: block; font-weight: 400; font-size: 0.82rem; color: var(--muted); white-space: normal; margin-top: 0.15rem; }
+.wide th.wrap-cell { white-space: normal; min-width: 12rem; }
