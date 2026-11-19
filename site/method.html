@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light dark">
+  <title>How the calculators were tested</title>
+  <meta name="description" content="Nine Indian personal-loan eligibility calculators give the same person very different answers. Here is the rule behind each one.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="method.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <div class="wrap">
+        <p class="site-title"><a href="index.html">Same person, different “You are eligible”</a></p>
+        <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
+      </div>
+      <nav class="tabs" aria-label="Pages">
+        <div class="wrap tabs-inner scroll">
+          <a href="index.html">Overview</a>
+          <a href="bajaj-finserv.html">Bajaj Finserv</a>
+          <a href="paisabazaar.html">Paisabazaar</a>
+          <a href="kotak.html">Kotak</a>
+          <a href="idfc-first.html">IDFC FIRST</a>
+          <a href="smfg.html">SMFG</a>
+          <a href="axis.html">Axis</a>
+          <a href="fibe.html">Fibe</a>
+          <a href="poonawalla.html">Poonawalla</a>
+          <a href="aditya-birla-capital.html">Aditya Birla</a>
+          <a href="compare.html">Compare</a>
+          <a href="method.html" aria-current="page">Method</a>
+        </div>
+      </nav>
+    </header>
+    <div class="strip"><div class="wrap"><p><strong>Not financial advice.</strong> Calculators, not loan offers. Results here are recreated from rules worked out by testing the public pages; not made by, or connected to, any of these companies. Nothing you type here leaves your browser.</p></div></div>
+    <main class="wrap" id="main">
+      <h1 tabindex="-1">How we tested</h1>
+      <section class="section" aria-labelledby="m-h">
+        <h3 id="m-h">Method <span class="draft">[DRAFT]</span></h3>
+        <p>We treated each calculator as a black box: we changed what we typed in and recorded what the page showed. On 14 November 2026 the Bajaj Finserv and Paisabazaar calculators were tested in a web browser. On 18–19 November 2026 a script opened each of the other seven calculators (and Bajaj Finserv again) in an automated browser, typed values into the calculator’s own boxes, and recorded the result text.</p>
+        <p>For each calculator we changed one input at a time across its range (sweeps), narrowed down where the result jumped (boundary searches), and fitted the simplest rule that reproduced every result. Interest rates were found by searching for the rate whose annuity factor reproduces the slope of the amount. Each rule was then tested on held-out inputs chosen after the rule was fixed, and on 12 standard people. Where a held-out check failed, the rule was refined once and tested again on fresh inputs.</p>
+        <p>We did not log in, did not enter a name, phone number, email, PAN, Aadhaar, date of birth or OTP, and did not click “Apply” or submit anything. Changing the inputs sent nothing to a lender: every calculator works in the browser.</p>
+      </section>
+      <section class="section" aria-labelledby="v-h">
+        <h3 id="v-h">Verification</h3>
+        <p><span data-n="analysed"></span> checks were analysed, after corrections (the logs also keep error and correction rows). Every comparable check matched the rule to within ₹1: <span data-n="build"></span> rule-building checks, <span data-n="heldOut"></span> held-out checks and <span data-n="persona"></span> standard-people checks. <span data-n="notComparable"></span> were not comparable because the page kept an old, greyed-out amount.</p>
+        <div class="table-scroll"><table class="wide">
+          <thead><tr><th scope="col">Calculator</th><th scope="col">Tested</th><th scope="col">Rule-building</th><th scope="col">Held-out</th><th scope="col">Standard people</th><th scope="col">Input limits</th><th scope="col">Not comparable</th><th scope="col">Data</th></tr></thead>
+          <tbody id="ver-body"></tbody>
+        </table></div>
+        <ul class="links">
+          <li><a href="checker_probes.csv" download>Download the 14 November checks for Bajaj Finserv and Paisabazaar (checker_probes.csv)</a></li>
+          <li><a href="data/personas.csv" download>Download the standard-people results (personas.csv)</a></li>
+        </ul>
+      </section>
+      <section class="section" aria-labelledby="l-h">
+        <h3 id="l-h">Limits <span class="draft">[DRAFT]</span></h3>
+        <ul>
+          <li>These are calculators, not loan offers. Real lenders also look at credit score, job, documents and more.</li>
+          <li>A snapshot: the sites can change at any time. Paisabazaar was tested on 14 November 2026 only.</li>
+          <li>Black-box: the rules match every case we tried, but we did not see the sites’ code. A rule could differ for inputs we did not try. Parts marked “inferred” were not pinned down exactly.</li>
+          <li>We never entered a date of birth, so any effect of age on Axis Bank and SMFG India Credit is unknown.</li>
+          <li>Calculators ask for different things (“expenses”, “obligations”, “EMIs”). On the compare page the same person is mapped to each one’s boxes as shown there.</li>
+          <li>Several other calculators were looked at but not tested: some had no eligibility calculator, one was under maintenance, and some would not load or need decisions first.</li>
+        </ul>
+      </section>
+    </main>
+    <footer class="foot wrap">
+      <p>Not financial advice.</p>
+      <p>Nothing you type here leaves your browser.</p>
+      <p>Contact: [to be added]</p>
+    </footer>
+  </div>
+</body>
+</html>

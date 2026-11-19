@@ -246,3 +246,168 @@ export function snapPaisabazaarInputs(input) {
   }
   return { values, changes, kept };
 }
+
+// ===========================================================================
+// Seven more calculators, from the audit extension (tested 18–19 November 2026).
+// Ported from loan_audit/rules/*.py (the source of truth for these). Every rule below
+// reproduced every comparable probe within ₹1, including held-out probes.
+// Each function returns one of
+//   { shown: 'amount', amount }                       the page shows an amount
+//   { shown: 'message', message }                     the page shows a message instead
+//   { shown: 'hidden' }                               the result disappears, with no message
+//   { shown: 'stale' }                                a warning, and an OLD amount stays greyed out
+// ===========================================================================
+
+const amountResult = (amount) => ({ shown: 'amount', amount: Math.max(0, Math.round(amount)) });
+
+// --- Kotak Mahindra Bank ----------------------------------------------------
+export const KOTAK = Object.freeze({
+  incomeMultiple: 20,
+  emiDisplayRatePct: 8.5,          // rate behind the "Monthly EMI" shown next to the amount
+  limits: { monthlyIncome: { min: 20000, max: 500000 }, existingEmi: { min: 0, max: 200000 }, tenureMonths: { min: 1, max: 200 } },
+});
+/** eligible = max(0, 20 × (income − existing EMIs)); the tenure slider has no effect. */
+export function kotak(monthlyIncome, existingEmi) {
+  return amountResult(KOTAK.incomeMultiple * (monthlyIncome - existingEmi));
+}
+/** The EMI Kotak shows next to the amount: the amount repaid at 8.5% over the slider tenure (months), rounded down. */
+export function kotakEmi(amount, tenureMonths) {
+  return Math.floor(amount / annuityFactor(KOTAK.emiDisplayRatePct, tenureMonths));
+}
+
+// --- IDFC FIRST Bank --------------------------------------------------------
+export const IDFC = Object.freeze({
+  ratePct: 9.99,
+  share: 0.7,
+  cap: 1500000,
+  limits: { money: { min: 0, max: 10000000 }, tenureMonths: { min: 6, max: 60 } },
+});
+/**
+ * room   = 0.7 × (income + other income − rent − SIPs − utilities − EMIs) − EMIs
+ * amount = min(15,00,000, annuityFactor(9.99%, tenure) × room), never below 0
+ */
+export function idfcFirst({ monthlyIncome, otherIncome, rent, sipInvestments, utilitiesOtherExpenses, existingEmi, tenureMonths }) {
+  const room = IDFC.share * (monthlyIncome + otherIncome - rent - sipInvestments - utilitiesOtherExpenses - existingEmi) - existingEmi;
+  return amountResult(Math.min(IDFC.cap, annuityFactor(IDFC.ratePct, tenureMonths) * room));
+}
+export function idfcRoom(v) {
+  return IDFC.share * (v.monthlyIncome + v.otherIncome - v.rent - v.sipInvestments - v.utilitiesOtherExpenses - v.existingEmi) - v.existingEmi;
+}
+
+// --- SMFG India Credit ------------------------------------------------------
+export const SMFG = Object.freeze({
+  salariedShare: 0.7,
+  selfEmployedShare: 0.65,
+  message: 'Your monthly income seems to be less than your expenses. Please reenter values',
+  limits: {
+    monthlyIncome: { min: 100000, max: 1000000 },
+    existingEmi: { min: 0, max: 1000000 },
+    ratePct: { min: 12.5, max: 30 },
+    tenureMonths: { min: 12, max: 60 },
+    selfTenureMonths: { min: 12, max: 48 },
+  },
+});
+/** Salaried tab: annuityFactor(rate, tenure) × 0.70 × (income − EMIs); no cap. */
+export function smfg(monthlyIncome, existingEmi, ratePct, tenureMonths) {
+  if (existingEmi >= monthlyIncome) return { shown: 'message', message: SMFG.message };
+  return amountResult(annuityFactor(ratePct, tenureMonths) * SMFG.salariedShare * (monthlyIncome - existingEmi));
+}
+/** Self-employed tab: annuityFactor(rate, tenure ≤ 48) × 0.65 × (yearly profit ÷ 12 − EMIs). */
+export function smfgSelfEmployed(yearlyProfit, existingEmi, ratePct, tenureMonths) {
+  const monthly = yearlyProfit / 12;
+  if (existingEmi >= monthly) return { shown: 'message', message: SMFG.message };
+  return amountResult(annuityFactor(ratePct, tenureMonths) * SMFG.selfEmployedShare * (monthly - existingEmi));
+}
+
+// --- Axis Bank --------------------------------------------------------------
+export const AXIS = Object.freeze({
+  highMultiple: 15,
+  lowMultiple: 10,
+  band1: 0.6,      // true edge is between 60% and 62.5% (₹1,000 slider steps)
+  band2: 0.7,      // true edge is between 70% and 72.5%
+  cap: 1500000,
+  limits: { monthlyIncome: { min: 10000, max: 500000 }, monthlyExpense: { min: 0, max: 500000 } },
+});
+/** 15 × income if expenses ≤ 60% of income, 10 × if ≤ 70%, else 0; never more than ₹15 lakh. */
+export function axis(monthlyIncome, monthlyExpense) {
+  const m = monthlyExpense <= AXIS.band1 * monthlyIncome ? AXIS.highMultiple
+    : monthlyExpense <= AXIS.band2 * monthlyIncome ? AXIS.lowMultiple : 0;
+  return amountResult(Math.min(AXIS.cap, m * monthlyIncome));
+}
+
+// --- Fibe -------------------------------------------------------------------
+export const FIBE = Object.freeze({
+  ratePct: 24,
+  emiShare: 0.3,
+  affordShare: 0.7,
+  roundTo: 500,
+  cap: 1000000,
+  fallbackMultiple: 1.5,
+  tiers: [{ upTo: 20000, months: 6 }, { upTo: 30000, months: 12 }, { upTo: 50000, months: 24 }, { upTo: Infinity, months: 36 }],
+  limits: { monthlyIncome: { min: 20000, max: 300000 }, monthlyExpense: { min: 0, max: 300000 } },
+});
+export function fibeTenure(monthlyIncome) {
+  return FIBE.tiers.find((t) => monthlyIncome <= t.upTo).months;
+}
+/**
+ * tenure set by income (6 / 12 / 24 / 36 months); room = min(30% of income, 70% of income − expenses);
+ * amount = min(10 lakh, annuityFactor(24%, tenure) × room, rounded UP to ₹500);
+ * 6-month tier, or no room: 1.5 × income over 6 months; expenses above income: no result shown.
+ */
+export function fibe(monthlyIncome, monthlyExpense) {
+  if (monthlyExpense > monthlyIncome) return { shown: 'hidden' };
+  const months = fibeTenure(monthlyIncome);
+  const room = Math.min(FIBE.emiShare * monthlyIncome, FIBE.affordShare * monthlyIncome - monthlyExpense);
+  if (months === 6 || room <= 0) return { ...amountResult(FIBE.fallbackMultiple * monthlyIncome), months: 6 };
+  const amount = Math.min(FIBE.cap, Math.ceil(annuityFactor(FIBE.ratePct, months) * room / FIBE.roundTo) * FIBE.roundTo);
+  return { ...amountResult(amount), months };
+}
+
+// --- Poonawalla Fincorp -----------------------------------------------------
+export const POONAWALLA = Object.freeze({
+  ratePct: 14,
+  bands: [{ upTo: 50000, share: 0.55 }, { upTo: 100000, share: 0.65 }, { upTo: Infinity, share: 0.75 }],
+  cap: 2000000,
+  minShown: 100000,   // inferred: shown at ₹1,28,931, hidden at ₹85,954
+  limits: { monthlyIncome: { min: 30000, max: 5000000 }, existingEmi: { min: 0, max: 1000000 }, tenureMonths: { min: 12, max: 84 } },
+});
+export function poonawallaShare(monthlyIncome) {
+  return POONAWALLA.bands.find((b) => monthlyIncome <= b.upTo).share;
+}
+/** annuityFactor(14%, tenure) × (share × income − EMIs), share 55% / 65% / 75%; cap ₹20 lakh; hidden below ₹1 lakh. */
+export function poonawalla(monthlyIncome, existingEmi, tenureMonths) {
+  const a = annuityFactor(POONAWALLA.ratePct, tenureMonths) * (poonawallaShare(monthlyIncome) * monthlyIncome - existingEmi);
+  if (a < POONAWALLA.minShown) return { shown: 'hidden' };
+  return amountResult(Math.min(POONAWALLA.cap, a));
+}
+
+// --- Aditya Birla Capital ---------------------------------------------------
+export const BIRLA = Object.freeze({
+  multipliers: { 1: 4, 2: 8, 3: 11, 4: 14, 5: 17, 6: 20, 7: 23 },
+  bands: [{ below: 75000, share: 0.65 }, { below: 150000, share: 0.7 }, { below: Infinity, share: 0.75 }],
+  cap: 5000000,
+  minShown: 100000,   // inferred: ₹1,03,544 shown, ₹98,837 replaced by the message
+  message: "We're sorry! we will not be able to help you with financing due to certain constraints.",
+  limits: {
+    emiAffordable: { min: 1000, max: 500000 }, monthlyIncome: { min: 25000, max: 500000 }, variableIncome: { min: 0, max: 500000 },
+    monthlyExpense: { min: 0, max: 500000 }, tenureYears: { min: 1, max: 7 }, ratePct: { min: 9, max: 13 },
+  },
+});
+export function birlaShare(totalIncome) {
+  return BIRLA.bands.find((b) => totalIncome < b.below).share;
+}
+/**
+ * net = fixed + variable income − expenses
+ * amount = min(50 lakh, multiplier(years) × net, annuityFactor(rate, years × 12) × (share × income − expenses))
+ * Below ₹1 lakh: the "We're sorry" message. Invalid inputs: warning and a greyed-out old amount.
+ */
+export function adityaBirla({ emiAffordable, monthlyIncome, variableIncome, monthlyExpense, tenureYears, ratePct }) {
+  const income = monthlyIncome + variableIncome;
+  const net = income - monthlyExpense;
+  if (monthlyExpense > income || emiAffordable > net) return { shown: 'stale' };
+  const limit1 = BIRLA.multipliers[tenureYears] * net;
+  const limit2 = annuityFactor(ratePct, tenureYears * 12) * (birlaShare(income) * income - monthlyExpense);
+  const amount = Math.min(BIRLA.cap, limit1, limit2);
+  if (amount < BIRLA.minShown) return { shown: 'message', message: BIRLA.message };
+  return { ...amountResult(amount), limit1: Math.round(limit1), limit2: Math.round(limit2) };
+}

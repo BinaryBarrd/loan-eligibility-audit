@@ -1,182 +1,166 @@
-// Checks on site/index.html itself: the example table, the numbers on the page,
-// the wording rules and the "unlisted" settings (CLAUDE.md Sections 5, 6 and 10).
+// Checks on the pages themselves (CLAUDE.md Sections 5, 6 and 10): unlisted settings, wording rules,
+// no names, no external requests, the disclaimer gate, the menu, and that every number written in the
+// platform pages comes from rules.js, audit-data.js (counted from the probe logs) or a probe CSV.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import * as rules from '../site/rules.js';
+import { AUDIT } from '../site/audit-data.js';
+import { PLATFORMS, run, defaults } from '../site/platforms.js';
 import { parseCsv } from './csv.js';
 
-const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
-const HTML = read('../site/index.html');
-const PROBES = parseCsv(read('../data/checker_probes.csv'));
+const path = (rel) => fileURLToPath(new URL(rel, import.meta.url));
+const read = (rel) => readFileSync(path(rel), 'utf8');
+const SITE_FILES = readdirSync(path('../site')).filter((f) => /\.(html|js|css)$/.test(f));
+const HTML_FILES = SITE_FILES.filter((f) => f.endsWith('.html'));
+const html = (f) => read(`../site/${f}`);
 
-/** Visible text of the HTML: no tags, scripts, styles or attribute values. */
-function visibleText(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/g, ' ')
-    .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/\s+/g, ' ');
+function visibleText(s) {
+  return s.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ');
 }
-const rupees = (s) => Number(s.replace(/[^\d]/g, ''));
 
 // ---------------------------------------------------------------------------
-test('example table: every cell matches the rules, and every seen cell is in the CSV', () => {
-  const cells = [...HTML.matchAll(/<td([^>]*)>([\s\S]*?)<\/td>/g)].map(([, attrs, body]) => ({
-    check: attrs.match(/data-check="([^"]+)"/)?.[1],
-    isRule: /data-rule="true"/.test(attrs),
-    text: visibleText(body).trim(),
-  }));
-  assert.equal(cells.length, 12, 'four people × three columns');
-  assert.equal(cells.filter((c) => c.isRule).length, 1, 'exactly one cell is marked rule');
-  assert.ok(cells.find((c) => c.isRule).text.includes('rule'), 'the rule cell keeps its "rule" label');
-
-  for (const cell of cells) {
-    const [site, ...args] = cell.check.split(' ');
-    const nums = args.map(Number);
-    const amountText = cell.text.match(/₹[\d,]+/)?.[0];
-
-    if (site === 'bajaj') {
-      const expected = rules.bajaj(...nums);
-      assert.equal(rupees(amountText), expected, cell.check);
-      const seen = PROBES.find((r) => r.site === 'bajaj_finserv' && r.probe_type !== 'limit'
-        && Number(r.monthly_income) === nums[0] && Number(r.monthly_expense_or_existing_emi) === nums[1]);
-      assert.ok(seen && Number(seen.shown_eligible_amount) === expected, `seen on site: ${cell.check}`);
-      continue;
-    }
-
-    const r = rules.paisabazaar(...nums);
-    if (/not eligible/.test(cell.text)) {
-      assert.equal(r.eligible, false, cell.check);
-      if (/debts/.test(cell.text)) assert.equal(r.reason, rules.NOT_ELIGIBLE.DEBTS_TOO_HIGH);
-    } else {
-      assert.equal(rupees(amountText), r.amount, cell.check);
-      const yearsMatch = cell.text.match(/tenure cut to (\d+) year/);
-      if (yearsMatch) assert.equal(r.years, Number(yearsMatch[1]), cell.check);
-    }
-    if (cell.isRule) continue; // the one predicted cell is not in the CSV, by design
-    const [age, desired, rate, tenure, income, emi] = nums;
-    const seen = PROBES.find((p) => p.site === 'paisabazaar' && Number(p.age) === age
-      && Number(p.desired_amount) === desired && Number(p.rate_pct) === rate
-      && Number(p.tenure_years_chosen) === tenure && Number(p.monthly_income) === income
-      && Number(p.monthly_expense_or_existing_emi) === emi);
-    assert.ok(seen, `seen on site: ${cell.check}`);
-    if (r.eligible) assert.equal(Number(seen.shown_eligible_amount), r.amount, cell.check);
-    else assert.match(seen.shown_message, /not eligible/, cell.check);
-  }
+test('twelve pages: overview, nine platforms, compare, method', () => {
+  assert.deepEqual([...HTML_FILES].sort(), ['index.html', 'compare.html', 'method.html', ...PLATFORMS.map((p) => p.file)].sort());
 });
 
-// ---------------------------------------------------------------------------
-test('every number written in the page comes from rules.js or the CSV', () => {
-  const allowed = new Map();
-  const allow = (n, why) => { if (!allowed.has(n)) allowed.set(n, why); };
-
-  for (const row of PROBES) {
-    for (const v of Object.values(row)) if (v !== '' && !Number.isNaN(Number(v))) allow(Number(v), 'CSV');
-  }
-  allow(PROBES.filter((r) => r.probe_type !== 'limit').length, 'CSV: number of checked probes');
-
-  const walk = (x, path) => {
-    if (typeof x === 'number') {
-      allow(x, path);
-      if (x > 0 && x < 1) allow(Math.round(x * 100), `${path} as %`);
-      if (x >= 100000 && x % 100000 === 0) allow(x / 100000, `${path} in lakh`);
-    } else if (x && typeof x === 'object') {
-      for (const [k, v] of Object.entries(x)) walk(v, `${path}.${k}`);
+test('every page is unlisted, has no external resources, and has the footer', () => {
+  for (const f of HTML_FILES) {
+    const s = html(f);
+    assert.match(s, /<meta name="robots" content="noindex, nofollow">/, f);
+    assert.ok(s.includes('<link rel="icon" href="data:,">'), `${f}: inline icon`);
+    for (const [, url] of s.matchAll(/<(?:script|link)[^>]+(?:src|href)="([^"]+)"/g)) {
+      assert.ok(!/^https?:|^\/\//.test(url), `${f}: external resource ${url}`);
     }
-  };
-  for (const [name, value] of Object.entries(rules)) if (typeof value === 'object') walk(value, name);
-  allow(rules.BAJAJ_ASSUMPTIONS.months / 12, 'BAJAJ_ASSUMPTIONS.months in years');
-
-  // Not claims about the calculators: the test date and the ₹1 rounding tolerance / ₹1 of room.
-  allow(14, 'test date'); allow(2026, 'test year'); allow(1, 'rounding tolerance');
-
-  const text = visibleText(HTML);
-  const found = [...text.matchAll(/\d[\d,]*(?:\.\d+)?k?/g)].map(([m]) => {
-    const n = Number(m.replace(/,/g, '').replace(/k$/, ''));
-    return { raw: m, value: m.endsWith('k') ? n * 1000 : n };
-  });
-  assert.ok(found.length > 30, 'the page has numbers to check');
-  const unknown = found.filter((f) => !allowed.has(f.value));
-  assert.deepEqual(unknown, [], `numbers on the page with no source: ${unknown.map((u) => u.raw).join(', ')}`);
-});
-
-// ---------------------------------------------------------------------------
-test('none of the banned words appear (CLAUDE.md 5.9)', () => {
-  const banned = /mislead|shady|fishy|scam|trick|fraud|predator|\blies?\b|\blied\b|cheat|dark pattern/i;
-  for (const file of ['../site/index.html', '../site/app.js', '../site/styles.css', '../site/rules.js']) {
-    const hit = read(file).match(banned);
-    assert.equal(hit, null, `${file}: "${hit?.[0]}"`);
+    const text = visibleText(s);
+    for (const line of ['Not financial advice.', 'Nothing you type here leaves your browser.', 'Contact: [to be added]']) {
+      assert.ok(text.includes(line), `${f}: ${line}`);
+    }
   }
-});
-
-test('unlisted: noindex meta tag, robots.txt and the Vercel noindex header', () => {
-  assert.match(HTML, /<meta name="robots" content="noindex, nofollow">/);
   assert.equal(read('../site/robots.txt').trim(), 'User-agent: *\nDisallow: /');
   const headers = JSON.parse(read('../site/vercel.json')).headers.flatMap((h) => h.headers);
   assert.ok(headers.some((h) => h.key === 'X-Robots-Tag' && h.value === 'noindex, nofollow'));
   assert.ok(headers.some((h) => h.key === 'Referrer-Policy' && h.value === 'no-referrer'));
+  assert.doesNotMatch(read('../site/styles.css'), /@import|url\(\s*['"]?https?:/);
 });
 
-test('page has the date stamp, both links, the DRAFT markers and the footer', () => {
-  const text = visibleText(HTML);
-  assert.match(text, /Tested on 14 November 2026\. The sites may have changed since\./);
-  assert.ok(HTML.includes('href="https://www.bajajfinserv.in/personal-loan-eligibility-calculator"'));
-  assert.ok(HTML.includes('href="https://www.paisabazaar.com/personal-loan/eligibility-calculator/"'));
-  assert.match(text, /How we tested \[DRAFT\]/);
-  assert.match(text, /Limits \[DRAFT\]/);
-  assert.ok(HTML.includes('href="checker_probes.csv" download'));
-  for (const line of ['Not financial advice.', 'Nothing you type here leaves your browser.', 'Contact: [to be added]']) {
+test('scripts make no network requests and use no storage or cookies', () => {
+  for (const f of SITE_FILES.filter((x) => x.endsWith('.js'))) {
+    const s = read(`../site/${f}`);
+    assert.doesNotMatch(s, /\bfetch\(|XMLHttpRequest|sendBeacon|WebSocket|localStorage|sessionStorage|document\.cookie|indexedDB/, f);
+    for (const [, url] of s.matchAll(/^import[^;]*?from\s+['"]([^'"]+)['"]/gm)) assert.ok(url.startsWith('./'), `${f}: import ${url}`);
+  }
+});
+
+test('none of the banned words appear (CLAUDE.md 5.9)', () => {
+  const banned = /mislead|shady|fishy|scam|trick|fraud|predator|\blies?\b|\blied\b|cheat|dark pattern/i;
+  for (const f of SITE_FILES) {
+    const hit = read(`../site/${f}`).match(banned);
+    assert.equal(hit, null, `${f}: "${hit?.[0]}"`);
+  }
+});
+
+test('no names or affiliations (the company “Aditya Birla Capital” is the only “Aditya” allowed)', () => {
+  const names = /bansal|\bbits\b|pilani|professor|university|[a-z0-9._-]+@[a-z0-9-]+\.[a-z]/i;
+  const firstName = /aditya(?![\s_-]?birla)/i;
+  for (const f of SITE_FILES) {
+    const s = read(`../site/${f}`);
+    assert.equal(s.match(names), null, `${f}: "${s.match(names)?.[0]}"`);
+    assert.equal(s.match(firstName), null, `${f}: "${s.match(firstName)?.[0]}"`);
+  }
+});
+
+test('overview: disclaimer first, with a continue button; the rest starts hidden', () => {
+  const s = html('index.html');
+  const d = s.indexOf('id="disclaimer"'); const app = s.indexOf('<div id="app" hidden>');
+  assert.ok(d > 0 && app > d);
+  assert.match(s, /<button type="button" class="primary" id="continue">/);
+  const text = visibleText(s.slice(d, app));
+  for (const line of ['Not financial advice.', '“indicative”', 'November 2026', 'Nothing you type here leaves your browser.', 'Not connected to any of these companies.']) {
     assert.ok(text.includes(line), line);
   }
 });
 
-test('no external scripts, styles or fonts', () => {
-  for (const [, url] of HTML.matchAll(/<(?:script|link)[^>]+(?:src|href)="([^"]+)"/g)) {
-    assert.ok(!/^https?:|^\/\//.test(url), `external resource: ${url}`);
+test('every page links every page, and marks itself as current', () => {
+  for (const f of HTML_FILES) {
+    const s = html(f);
+    for (const g of HTML_FILES) assert.ok(s.includes(`<a href="${g}"`), `${f} links ${g}`);
+    assert.ok(s.includes(`<a href="${f}" aria-current="page">`), `${f} marks itself`);
+    if (f !== 'index.html') assert.match(visibleText(s), /Not financial advice\. Calculators, not loan offers\./, `${f}: strip`);
   }
-  assert.doesNotMatch(read('../site/styles.css'), /@import|url\(\s*['"]?https?:/);
-  // An inline empty icon stops the browser from asking the server for /favicon.ico.
-  assert.ok(HTML.includes('<link rel="icon" href="data:,">'));
 });
 
-test('no names or affiliations on the page', () => {
-  const names = /aditya|bansal|bits|pilani|professor|university|@[a-z0-9-]+\./i;
-  for (const file of ['../site/index.html', '../site/app.js', '../site/rules.js']) {
-    const hit = read(file).match(names);
-    assert.equal(hit, null, `${file}: "${hit?.[0]}"`);
+test('each platform page names its platform, and its download is an exact copy', () => {
+  for (const p of PLATFORMS) {
+    assert.match(html(p.file), new RegExp(`<body data-platform="${p.id}">`), p.file);
+    assert.equal(read(`../site/data/${p.id}.csv`), read(`../data/audit/${p.id}.csv`), `${p.id}: download copy`);
+  }
+  assert.ok(existsSync(path('../site/data/personas.csv')));
+});
+
+test('Method and Limits are marked [DRAFT]', () => {
+  const text = visibleText(html('method.html'));
+  assert.match(text, /Method \[DRAFT\]/);
+  assert.match(text, /Limits \[DRAFT\]/);
+  assert.match(text, /a script opened each of the other seven calculators/);
+});
+
+test('every platform shows a result for its default inputs', () => {
+  for (const p of PLATFORMS) {
+    const r = run(p, defaults(p));
+    assert.equal(r.state, 'result', p.id);
+    assert.ok(r.display.some((d) => d && (d.k === 'amount' || d.k === 'message')), p.id);
   }
 });
 
 // ---------------------------------------------------------------------------
-test('disclaimer screen comes first, with a continue button; the rest starts hidden', () => {
-  const disclaimerAt = HTML.indexOf('id="disclaimer"');
-  const appAt = HTML.indexOf('<div id="app" hidden>');
-  assert.ok(disclaimerAt > 0 && appAt > disclaimerAt, 'disclaimer before the hidden app');
-  assert.match(HTML, /<button type="button" class="primary" id="continue">/);
-  const text = visibleText(HTML.slice(disclaimerAt, appAt));
-  for (const line of ['Not financial advice.', '“indicative”', '14 November 2026', 'Nothing you type here leaves your browser.']) {
-    assert.ok(text.includes(line), `disclaimer mentions: ${line}`);
-  }
-});
+// Numbers
+// ---------------------------------------------------------------------------
+const allowed = new Map();
+const allow = (n, why) => { if (Number.isFinite(n) && !allowed.has(n)) allowed.set(n, why); };
+const numbersIn = (s) => [...String(s).matchAll(/\d[\d,]*(?:\.\d+)?/g)].map(([m]) => Number(m.replace(/,/g, '')));
+function allowDerived(x, why) {
+  allow(x, why);
+  if (x > 0 && x < 1) { allow(Math.round(x * 1000) / 10, `${why} as %`); allow(Math.round((1 - x) * 1000) / 10, `${why}: 100% minus`); }
+  if (x >= 100000) allow(x / 100000, `${why} in lakh`);
+  if (x >= 10000000) allow(x / 10000000, `${why} in crore`);
+  if (x >= 12 && x % 12 === 0) allow(x / 12, `${why} in years`);
+}
+function walk(x, why) {
+  if (typeof x === 'number') allowDerived(x, why);
+  else if (typeof x === 'string') for (const n of numbersIn(x)) allowDerived(n, `${why} (text)`);
+  else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) walk(v, `${why}.${k}`);
+}
+for (const [name, value] of Object.entries(rules)) if (typeof value === 'object') walk(value, name);
+walk(AUDIT, 'AUDIT');
+for (const f of readdirSync(path('../data/audit'))) {
+  for (const row of parseCsv(read(`../data/audit/${f}`))) for (const v of Object.values(row)) for (const n of numbersIn(v)) allowDerived(n, f);
+}
+for (const row of parseCsv(read('../data/checker_probes.csv'))) for (const v of Object.values(row)) for (const n of numbersIn(v)) allowDerived(n, 'checker_probes.csv');
+// Worked examples on the pages, each recomputed here from the rules.
+const examples = [
+  rules.kotakEmi(rules.kotak(40000, 10000).amount, 1),
+  rules.smfg(1000000, 10000, 12.5, 60).amount,
+  ...[24000, 25000, 29000].map((e) => rules.axis(40000, e).amount),
+  rules.fibe(20000, 20000).amount,
+  ...[50000, 51000].map((i) => rules.poonawalla(i, 0, 60).amount),
+  1 + rules.IDFC.share,
+];
+for (const n of examples) allowDerived(n, 'worked example');
+for (let i = 0; i <= 12; i++) allow(i, 'small count');
 
-test('three tabs, each a hidden section linked from the tab bar', () => {
-  for (const id of ['bajaj', 'paisabazaar', 'compare']) {
-    assert.match(HTML, new RegExp(`<a href="#${id}" data-tab="${id}">`), `tab link ${id}`);
-    assert.match(HTML, new RegExp(`<section id="${id}" class="tab"[^>]*hidden>`), `hidden section ${id}`);
+test('every number in the platform texts and pages comes from the rules, the audit data or a probe CSV', () => {
+  const unknown = [];
+  for (const p of PLATFORMS) {
+    const texts = [p.fixedNote, p.notRetested, p.formula, ...p.behind, ...p.ignores, ...p.findings.flat(),
+      ...p.fields.flatMap((f) => [f.label, f.help])].filter(Boolean);
+    for (const t of texts) for (const n of numbersIn(t)) if (!allowed.has(n)) unknown.push(`${p.id}: ${n} in “${t.slice(0, 80)}”`);
   }
-});
-
-test('each calculator tab has only its own boxes, each with a label', () => {
-  const section = (id) => HTML.slice(HTML.indexOf(`<section id="${id}"`), HTML.indexOf('</section>', HTML.indexOf(`<section id="${id}"`)));
-  const inputs = (id) => [...section(id).matchAll(/<input id="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(inputs('bajaj'), ['bajaj-income', 'bajaj-expense']);
-  assert.deepEqual(inputs('paisabazaar'), ['pb-age', 'pb-income', 'pb-emi', 'pb-desired', 'pb-rate', 'pb-tenure']);
-  for (const id of [...inputs('bajaj'), ...inputs('paisabazaar')]) {
-    assert.ok(HTML.includes(`<label for="${id}">`), `label for ${id}`);
+  for (const f of HTML_FILES) {
+    for (const n of numbersIn(visibleText(html(f)))) if (!allowed.has(n)) unknown.push(`${f}: ${n}`);
   }
+  assert.deepEqual(unknown, []);
 });
