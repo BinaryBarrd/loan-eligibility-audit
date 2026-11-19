@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import * as rules from '../site/rules.js';
 import { AUDIT } from '../site/audit-data.js';
 import { PLATFORMS, run, defaults } from '../site/platforms.js';
+import { personaSpread } from '../site/people.js';
 import { parseCsv } from './csv.js';
 
 const path = (rel) => fileURLToPath(new URL(rel, import.meta.url));
@@ -98,7 +99,9 @@ test('every page preloads every module it uses, so they download in parallel', (
   const imports = (f) => [...read(`../site/${f}`).matchAll(/^import[^;]*?from\s+'\.\/([^']+)'/gm)].map((m) => m[1]);
   for (const f of HTML_FILES) {
     const s = html(f);
-    const entry = s.match(/<script type="module" src="([^"]+)">/)[1];
+    const m = s.match(/<script type="module" src="([^"]+)">/);
+    if (!m) continue; // a page with no script (method.html)
+    const entry = m[1];
     const need = new Set([entry]); const todo = [entry];
     while (todo.length) for (const m of imports(todo.pop())) if (!need.has(m)) { need.add(m); todo.push(m); }
     for (const m of need) assert.ok(s.includes(`<link rel="modulepreload" href="${m}">`), `${f}: preload ${m}`);
@@ -111,6 +114,13 @@ test('each platform page names its platform, and its download is an exact copy',
     assert.equal(read(`../site/data/${p.id}.csv`), read(`../data/audit/${p.id}.csv`), `${p.id}: download copy`);
   }
   assert.ok(existsSync(path('../site/data/personas.csv')));
+});
+
+test('overview and method content is written into the page, not built by a script', () => {
+  assert.equal((html('index.html').match(/<a class="card" href=/g) || []).length, PLATFORMS.length);
+  assert.ok((html('index.html').match(/<ol class="takeaways" id="takeaways">([\s\S]*?)<\/ol>/)[1].match(/<li>/g) || []).length >= 5);
+  assert.equal((html('method.html').match(/<tr><th scope="row">/g) || []).length, PLATFORMS.length);
+  assert.doesNotMatch(html('method.html'), /<script/);
 });
 
 test('Method and Limits are marked [DRAFT]', () => {
@@ -163,6 +173,7 @@ const examples = [
 ];
 for (const n of examples) allowDerived(n, 'worked example');
 for (let i = 0; i <= 12; i++) allow(i, 'small count');
+for (const s of personaSpread()) if (s.ratio) allow(Math.round(s.ratio * 10) / 10, 'persona spread ratio');
 
 test('every number in the platform texts and pages comes from the rules, the audit data or a probe CSV', () => {
   const unknown = [];

@@ -9,13 +9,6 @@
   <meta name="description" content="Nine Indian personal-loan eligibility calculators give the same person very different answers. Here is the rule behind each one.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
-  <link rel="modulepreload" href="method.js">
-  <link rel="modulepreload" href="platforms.js">
-  <link rel="modulepreload" href="audit-data.js">
-  <link rel="modulepreload" href="common.js">
-  <link rel="modulepreload" href="fmt.js">
-  <link rel="modulepreload" href="rules.js">
-  <script type="module" src="method.js"></script>
 </head>
 <body>
   <div id="app">
@@ -52,10 +45,20 @@
       </section>
       <section class="section" aria-labelledby="v-h">
         <h3 id="v-h">Verification</h3>
-        <p><span data-n="analysed"></span> checks were analysed, after corrections (the logs also keep error and correction rows). Every comparable check matched the rule to within ₹1: <span data-n="build"></span> rule-building checks, <span data-n="heldOut"></span> held-out checks and <span data-n="persona"></span> standard-people checks. <span data-n="notComparable"></span> were not comparable because the page kept an old, greyed-out amount.</p>
+        <p>1,547 checks were analysed, after corrections (the logs also keep error and correction rows). Every comparable check matched the rule to within ₹1: 1,228 rule-building checks, 172 held-out checks and 105 standard-people checks. 40 were not comparable because the page kept an old, greyed-out amount.</p>
         <div class="table-scroll"><table class="wide">
           <thead><tr><th scope="col">Calculator</th><th scope="col">Tested</th><th scope="col">Rule-building</th><th scope="col">Held-out</th><th scope="col">Standard people</th><th scope="col">Input limits</th><th scope="col">Not comparable</th><th scope="col">Data</th></tr></thead>
-          <tbody id="ver-body"></tbody>
+          <tbody id="ver-body">
+            <tr><th scope="row"><a href="bajaj-finserv.html">Bajaj Finserv</a></th><td>14, 18 and 19 November 2026</td><td class="num">130/130</td><td class="num">21/21</td><td class="num">12/12</td><td class="num">2/2</td><td class="num">—</td><td><a href="data/bajaj_finserv.csv" download>bajaj_finserv.csv</a></td></tr>
+            <tr><th scope="row"><a href="paisabazaar.html">Paisabazaar</a></th><td>14 November 2026</td><td class="num">30/30</td><td class="num">5/5</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><a href="data/paisabazaar.csv" download>paisabazaar.csv</a></td></tr>
+            <tr><th scope="row"><a href="kotak.html">Kotak Mahindra Bank</a></th><td>18–19 November 2026</td><td class="num">92/92</td><td class="num">15/15</td><td class="num">12/12</td><td class="num">—</td><td class="num">—</td><td><a href="data/kotak.csv" download>kotak.csv</a></td></tr>
+            <tr><th scope="row"><a href="idfc-first.html">IDFC FIRST Bank</a></th><td>18–19 November 2026</td><td class="num">205/205</td><td class="num">15/15</td><td class="num">12/12</td><td class="num">—</td><td class="num">—</td><td><a href="data/idfc_first.csv" download>idfc_first.csv</a></td></tr>
+            <tr><th scope="row"><a href="smfg.html">SMFG India Credit</a></th><td>18–19 November 2026</td><td class="num">155/155</td><td class="num">15/15</td><td class="num">21/21</td><td class="num">—</td><td class="num">—</td><td><a href="data/smfg.csv" download>smfg.csv</a></td></tr>
+            <tr><th scope="row"><a href="axis.html">Axis Bank</a></th><td>18–19 November 2026</td><td class="num">105/105</td><td class="num">15/15</td><td class="num">12/12</td><td class="num">—</td><td class="num">—</td><td><a href="data/axis.csv" download>axis.csv</a></td></tr>
+            <tr><th scope="row"><a href="fibe.html">Fibe</a></th><td>18–19 November 2026</td><td class="num">122/122</td><td class="num">15/15</td><td class="num">12/12</td><td class="num">—</td><td class="num">—</td><td><a href="data/fibe.csv" download>fibe.csv</a></td></tr>
+            <tr><th scope="row"><a href="poonawalla.html">Poonawalla Fincorp</a></th><td>18–19 November 2026</td><td class="num">178/178</td><td class="num">45/45</td><td class="num">12/12</td><td class="num">—</td><td class="num">—</td><td><a href="data/poonawalla.csv" download>poonawalla.csv</a></td></tr>
+            <tr><th scope="row"><a href="aditya-birla-capital.html">Aditya Birla Capital</a></th><td>18–19 November 2026</td><td class="num">211/211</td><td class="num">26/26</td><td class="num">12/12</td><td class="num">—</td><td class="num">40</td><td><a href="data/aditya_birla.csv" download>aditya_birla.csv</a></td></tr>
+          </tbody>
         </table></div>
         <ul class="links">
           <li><a href="checker_probes.csv" download>Download the 14 November checks for Bajaj Finserv and Paisabazaar (checker_probes.csv)</a></li>

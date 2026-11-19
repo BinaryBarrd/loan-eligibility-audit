@@ -10,12 +10,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
   <link rel="modulepreload" href="index.js">
-  <link rel="modulepreload" href="platforms.js">
-  <link rel="modulepreload" href="people.js">
-  <link rel="modulepreload" href="audit-data.js">
-  <link rel="modulepreload" href="rules.js">
   <link rel="modulepreload" href="common.js">
-  <link rel="modulepreload" href="fmt.js">
   <script type="module" src="index.js"></script>
 </head>
 <body>
@@ -65,11 +60,28 @@
       <p class="lede">We tested nine personal-loan eligibility calculators and worked out the rule each one follows. Each page below recreates one calculator, shows the rule behind its number, and lists what the audit found.</p>
       <section class="section" aria-labelledby="take-h">
         <h3 id="take-h">Key takeaways</h3>
-        <ol class="takeaways" id="takeaways"></ol>
+        <ol class="takeaways" id="takeaways">
+          <li><strong>Same person, very different answers.</strong> For someone earning ₹40,000 a month with ₹10,000 of EMIs, the calculators showed from ₹1,88,305 (IDFC FIRST Bank) to ₹6,00,000 (Kotak Mahindra Bank). Across 12 standard people, the largest answer was 2.2× to 6.3× the smallest. For 3 of them one calculator said ₹0 while another said several lakh.</li>
+          <li><strong>Fixed formulas, not AI, and not a credit check.</strong> Every calculator follows one fixed formula, run in your browser. Changing the inputs sends nothing to the company. None of the nine asks for a credit score, though most pages say credit score matters.</li>
+          <li><strong>The assumptions are hidden.</strong> Each one assumes a different interest rate (none for Kotak and Axis; 9.99% IDFC FIRST; 10% Bajaj; 14% Poonawalla; 24% Fibe; your own choice on SMFG, Paisabazaar and Aditya Birla) and a different share of income for EMIs (from 55% to 75%). No result says which.</li>
+          <li><strong>Some boxes change nothing.</strong> Bajaj’s required city, Kotak’s tenure slider, Poonawalla’s qualification and Aditya Birla’s “EMI you can afford” do not change the eligible amount.</li>
+          <li><strong>Some results are odd.</strong> Bajaj says “You are eligible” for ₹0. Fibe and Poonawalla make the result disappear. Aditya Birla can leave an old amount on screen. Poonawalla’s “monthly payable amount” is the loan amount. Kotak can show a monthly EMI larger than your income.</li>
+          <li><strong>Every rule was checked.</strong> 1,547 checks across the nine calculators; every comparable one matched what the page showed to within ₹1, including 172 held-out checks not used to build the rules.</li>
+        </ol>
       </section>
       <section class="section" aria-labelledby="dir-h">
         <h3 id="dir-h">The nine calculators</h3>
-        <ul class="cards" id="cards"></ul>
+        <ul class="cards" id="cards">
+          <li><a class="card" href="bajaj-finserv.html"><strong>Bajaj Finserv</strong><span class="kindline">A lender (non-bank)</span><p class="rule">Always uses 10% a year over 5 years, whatever rate or tenure you would pick. The same page advertises rates from 10% to 30.5%.</p></a></li>
+          <li><a class="card" href="paisabazaar.html"><strong>Paisabazaar</strong><span class="kindline">A loan marketplace</span><p class="rule">Assumes up to 55% of your income can go to monthly instalments, counting the ones you already pay.</p></a></li>
+          <li><a class="card" href="kotak.html"><strong>Kotak Mahindra Bank</strong><span class="kindline">A bank</span><p class="rule">A plain multiple: 20 times what is left of your income after existing EMIs.</p></a></li>
+          <li><a class="card" href="idfc-first.html"><strong>IDFC FIRST Bank</strong><span class="kindline">A bank</span><p class="rule">Assumes 70% of the income left after all your commitments can go to a new EMI.</p></a></li>
+          <li><a class="card" href="smfg.html"><strong>SMFG India Credit</strong><span class="kindline">A lender (non-bank)</span><p class="rule">Assumes 70% of what is left after EMIs (65% if self-employed) can go to the new EMI.</p></a></li>
+          <li><a class="card" href="axis.html"><strong>Axis Bank</strong><span class="kindline">A bank</span><p class="rule">A step rule: 15 × income, 10 × income or nothing, depending on what share of income your expenses take.</p></a></li>
+          <li><a class="card" href="fibe.html"><strong>Fibe</strong><span class="kindline">A digital lending platform</span><p class="rule">Assumes 24% a year.</p></a></li>
+          <li><a class="card" href="poonawalla.html"><strong>Poonawalla Fincorp</strong><span class="kindline">A lender (non-bank)</span><p class="rule">Assumes 14% a year. The page header says “Interest Rate Starting at 9.99%* p.a.”</p></a></li>
+          <li><a class="card" href="aditya-birla-capital.html"><strong>Aditya Birla Capital</strong><span class="kindline">A lender (non-bank)</span><p class="rule">Two limits, and the smaller wins: a multiple of what is left after expenses (4, 8, 11, 14, 17, 20, 23 for 1 to 7 years), and what an EMI of 65% / 70% / 75% of income would repay.</p></a></li>
+        </ul>
         <p class="next"><a href="compare.html">Put one person into all nine →</a></p>
         <p class="next"><a href="method.html">How we tested, and the limits →</a></p>
       </section>

@@ -2,10 +2,13 @@
 The content is filled in by the page's script from rules.js, platforms.js and audit-data.js.
 Run from the TAI377 folder: python3 scripts/build_pages.py
 """
+import json
 import re
+import subprocess
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent / "site"
+PRE = json.loads(subprocess.run(["node", str(SITE.parent / "scripts" / "prerender.mjs")], capture_output=True, text=True, check=True).stdout)
 PLATFORMS = [  # (file, id, short name for the menu) in the order of platforms.js
     ("bajaj-finserv.html", "bajaj_finserv", "Bajaj Finserv"),
     ("paisabazaar.html", "paisabazaar", "Paisabazaar"),
@@ -33,7 +36,23 @@ def module_graph(script):
     return seen
 
 
+HEAD_START = """<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light dark">
+  <title>{title}</title>
+  <meta name="description" content="{desc}">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+"""
+
+
 def head(title, script, desc):
+    if not script:  # a page with no script at all
+        return HEAD_START.format(title=title, desc=desc) + "</head>\n"
     preload = "\n".join(f'  <link rel="modulepreload" href="{m}">' for m in module_graph(script))
     return f"""<!doctype html>
 <html lang="en-IN">
@@ -115,11 +134,15 @@ INDEX = f"""    <main class="wrap" id="main">
       <p class="lede">We tested nine personal-loan eligibility calculators and worked out the rule each one follows. Each page below recreates one calculator, shows the rule behind its number, and lists what the audit found.</p>
       <section class="section" aria-labelledby="take-h">
         <h3 id="take-h">Key takeaways</h3>
-        <ol class="takeaways" id="takeaways"></ol>
+        <ol class="takeaways" id="takeaways">
+          {PRE["takeaways"]}
+        </ol>
       </section>
       <section class="section" aria-labelledby="dir-h">
         <h3 id="dir-h">The nine calculators</h3>
-        <ul class="cards" id="cards"></ul>
+        <ul class="cards" id="cards">
+          {PRE["cards"]}
+        </ul>
         <p class="next"><a href="compare.html">Put one person into all nine →</a></p>
         <p class="next"><a href="method.html">How we tested, and the limits →</a></p>
       </section>
@@ -186,7 +209,7 @@ COMPARE = f"""    <main class="wrap" id="main">
     </main>
 """
 
-METHOD = """    <main class="wrap" id="main">
+METHOD = f"""    <main class="wrap" id="main">
       <h1 tabindex="-1">How we tested</h1>
       <section class="section" aria-labelledby="m-h">
         <h3 id="m-h">Method <span class="draft">[DRAFT]</span></h3>
@@ -196,10 +219,12 @@ METHOD = """    <main class="wrap" id="main">
       </section>
       <section class="section" aria-labelledby="v-h">
         <h3 id="v-h">Verification</h3>
-        <p><span data-n="analysed"></span> checks were analysed, after corrections (the logs also keep error and correction rows). Every comparable check matched the rule to within ₹1: <span data-n="build"></span> rule-building checks, <span data-n="heldOut"></span> held-out checks and <span data-n="persona"></span> standard-people checks. <span data-n="notComparable"></span> were not comparable because the page kept an old, greyed-out amount.</p>
+        <p>{PRE["n"]["analysed"]} checks were analysed, after corrections (the logs also keep error and correction rows). Every comparable check matched the rule to within ₹1: {PRE["n"]["build"]} rule-building checks, {PRE["n"]["heldOut"]} held-out checks and {PRE["n"]["persona"]} standard-people checks. {PRE["n"]["notComparable"]} were not comparable because the page kept an old, greyed-out amount.</p>
         <div class="table-scroll"><table class="wide">
           <thead><tr><th scope="col">Calculator</th><th scope="col">Tested</th><th scope="col">Rule-building</th><th scope="col">Held-out</th><th scope="col">Standard people</th><th scope="col">Input limits</th><th scope="col">Not comparable</th><th scope="col">Data</th></tr></thead>
-          <tbody id="ver-body"></tbody>
+          <tbody id="ver-body">
+            {PRE["verification"]}
+          </tbody>
         </table></div>
         <ul class="links">
           <li><a href="checker_probes.csv" download>Download the 14 November checks for Bajaj Finserv and Paisabazaar (checker_probes.csv)</a></li>
@@ -227,7 +252,7 @@ def main():
     for f, pid, name in PLATFORMS:
         page(f, "platform.js", f"{name}: loan eligibility calculator audit", f"The rule behind the {name} personal-loan eligibility calculator, and what a black-box audit found.", PLATFORM, data_platform=pid)
     page("compare.html", "compare.js", "Compare all nine calculators", desc, COMPARE)
-    page("method.html", "method.js", "How the calculators were tested", desc, METHOD)
+    page("method.html", None, "How the calculators were tested", desc, METHOD)
     print("wrote", 3 + len(PLATFORMS), "pages")
 
 
