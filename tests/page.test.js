@@ -123,10 +123,11 @@ test('overview and method content is written into the page, not built by a scrip
   assert.doesNotMatch(html('method.html'), /<script/);
 });
 
-test('Method and Limits are marked [DRAFT]', () => {
+test('Method and Limits are approved (no [DRAFT] marks) and say the testing was scripted', () => {
   const text = visibleText(html('method.html'));
-  assert.match(text, /Method \[DRAFT\]/);
-  assert.match(text, /Limits \[DRAFT\]/);
+  assert.doesNotMatch(text, /\[DRAFT\]/);
+  assert.match(text, /Method We treated each calculator/);
+  assert.match(text, /Limits These are calculators/);
   assert.match(text, /a script opened each of the other seven calculators/);
 });
 

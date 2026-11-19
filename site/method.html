@@ -38,7 +38,7 @@
     <main class="wrap" id="main">
       <h1 tabindex="-1">How we tested</h1>
       <section class="section" aria-labelledby="m-h">
-        <h3 id="m-h">Method <span class="draft">[DRAFT]</span></h3>
+        <h3 id="m-h">Method</h3>
         <p>We treated each calculator as a black box: we changed what we typed in and recorded what the page showed. On 14 November 2026 the Bajaj Finserv and Paisabazaar calculators were tested in a web browser. On 18–19 November 2026 a script opened each of the other seven calculators (and Bajaj Finserv again) in an automated browser, typed values into the calculator’s own boxes, and recorded the result text.</p>
         <p>For each calculator we changed one input at a time across its range (sweeps), narrowed down where the result jumped (boundary searches), and fitted the simplest rule that reproduced every result. Interest rates were found by searching for the rate whose annuity factor reproduces the slope of the amount. Each rule was then tested on held-out inputs chosen after the rule was fixed, and on 12 standard people. Where a held-out check failed, the rule was refined once and tested again on fresh inputs.</p>
         <p>We did not log in, did not enter a name, phone number, email, PAN, Aadhaar, date of birth or OTP, and did not click “Apply” or submit anything. Changing the inputs sent nothing to a lender: every calculator works in the browser.</p>
@@ -66,10 +66,10 @@
         </ul>
       </section>
       <section class="section" aria-labelledby="l-h">
-        <h3 id="l-h">Limits <span class="draft">[DRAFT]</span></h3>
+        <h3 id="l-h">Limits</h3>
         <ul>
           <li>These are calculators, not loan offers. Real lenders also look at credit score, job, documents and more.</li>
-          <li>A snapshot: the sites can change at any time. Paisabazaar was tested on 14 November 2026 only.</li>
+          <li>A snapshot: the sites can change at any time.</li>
           <li>Black-box: the rules match every case we tried, but we did not see the sites’ code. A rule could differ for inputs we did not try. Parts marked “inferred” were not pinned down exactly.</li>
           <li>We never entered a date of birth, so any effect of age on Axis Bank and SMFG India Credit is unknown.</li>
           <li>Calculators ask for different things (“expenses”, “obligations”, “EMIs”). On the compare page the same person is mapped to each one’s boxes as shown there.</li>
