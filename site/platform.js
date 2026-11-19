@@ -71,8 +71,7 @@ function build() {
   main.append(
     h('div', { class: 'tab-head' },
       h('h1', { tabindex: '-1' }, p.name),
-      h('p', { class: 'kind' }, `${p.kind}. Tested on ${dateList(p.testedOn)}. `, external(p.url, 'Open the original calculator')),
-      p.notRetested ? h('p', { class: 'notice' }, p.notRetested) : null),
+      h('p', { class: 'kind' }, `${p.kind}. Tested on ${dateList(p.testedOn)}. `, external(p.url, 'Open the original calculator'))),
 
     h('section', { class: 'calc', 'aria-label': 'Recreated calculator' },
       h('form', { class: 'inputs', id: 'calc-form', novalidate: true, autocomplete: 'off' },

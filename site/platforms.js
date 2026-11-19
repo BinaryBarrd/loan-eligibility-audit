@@ -98,7 +98,6 @@ const PB_REASON = {
 const paisabazaar = {
   id: 'paisabazaar', file: 'paisabazaar.html', name: 'Paisabazaar', kind: 'A loan marketplace',
   customRanges: true,
-  notRetested: 'Tested on 14 November 2026 only. On 19 November 2026 the page would not load in the automated browser, so it was not re-tested.',
   fields: [
     { key: 'age', label: 'Age', unit: 'years', min: PL.age.min, max: PL.age.max, def: 29 },
     money('income', 'Monthly income', PL.monthlyIncome, 40000),
