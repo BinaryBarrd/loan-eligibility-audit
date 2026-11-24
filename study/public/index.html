@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>How people read loan calculators</title>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="study.css">
+  <script type="module" src="study.js"></script>
+</head>
+<body>
+<main class="wrap" id="main">
+
+  <!-- Screen 1: information and consent -->
+  <section id="s1" data-screen="1" aria-labelledby="h1-s1">
+    <p class="step">Step 1 of 6</p>
+    <h1 id="h1-s1" tabindex="-1">How people read loan calculators</h1>
+    <p class="lede">A short study, about seven minutes, on how people read the results of online loan eligibility calculators.</p>
+
+    <div class="info">
+      <h2>What you will do</h2>
+      <p>Type in some monthly figures, your own or made-up ones. You will see what nine loan calculators would show for them, and answer a few questions.</p>
+
+      <h2>It is anonymous</h2>
+      <p>The study never asks for your name, email, phone number or gender, and keeps your age only as an age group. Your exact money figures are used only to work out the nine results, and are never stored.</p>
+      <p>What is kept: your answers, your money figures as ranges (for example ₹30,000–₹49,999), and how the nine results compared with each other. The anonymous answers will be published with the research. No one can be identified from them.</p>
+
+      <h2>It is not a loan application</h2>
+      <p>Nothing you type is sent to any lender. The nine results are worked out from the public eligibility calculators of nine Indian lenders, as they were tested in November 2026. They are not loan offers, and the lenders are not named.</p>
+
+      <h2>Taking part is voluntary</h2>
+      <p>You can stop at any time by closing this page. Nothing is saved until you press “Submit answers” on the last screen.</p>
+      <p class="small muted">Like almost all websites, the website host keeps short-lived visit logs, which include IP addresses. The study never reads or stores them, and uses no cookies or tracking.</p>
+
+      <h2>Who runs it</h2>
+      <p>Aditya Bansal. Questions about the study: <span id="contact">[study email to be added]</span>.</p>
+    </div>
+
+    <form id="f1" novalidate>
+      <fieldset class="agree" id="f-consent">
+        <legend>Before you start</legend>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="adult" value="yes"> <span>I am 18 or older.</span></label>
+          <label class="option"><input type="checkbox" name="agree" value="yes"> <span>I have read the information above and agree to take part.</span></label>
+        </div>
+        <p class="q-error" id="e-consent"></p>
+      </fieldset>
+      <div class="actions"><button type="submit" class="primary">Start</button></div>
+    </form>
+  </section>
+
+  <!-- Screen 2: about you -->
+  <section id="s2" data-screen="2" aria-labelledby="h1-s2" hidden>
+    <p class="step">Step 2 of 6</p>
+    <h1 id="h1-s2" tabindex="-1">About you</h1>
+    <p>These answers describe the people taking part. None of them identifies you.</p>
+    <form id="f2" novalidate>
+      <div id="q-background"></div>
+      <p class="form-error" id="e-f2" role="alert"></p>
+      <div class="actions"><button type="submit" class="primary">Continue</button></div>
+    </form>
+  </section>
+
+  <!-- Screen 3: your numbers -->
+  <section id="s3" data-screen="3" aria-labelledby="h1-s3" hidden>
+    <p class="step">Step 3 of 6</p>
+    <h1 id="h1-s3" tabindex="-1">Your numbers</h1>
+    <p>Type in monthly figures. <strong>Made-up numbers are fine.</strong> Your exact figures are used only to work out the results, and are never stored.</p>
+    <form id="f3" novalidate>
+      <div id="q-numbers"></div>
+      <p class="form-error" id="e-f3" role="alert"></p>
+      <div class="actions">
+        <button type="button" class="back" data-back="2">Back</button>
+        <button type="submit" class="primary" id="b-results">See the results</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Screen 4: your results -->
+  <section id="s4" data-screen="4" aria-labelledby="h1-s4" hidden>
+    <p class="step">Step 4 of 6</p>
+    <h1 id="h1-s4" tabindex="-1">Your results</h1>
+    <p>What nine loan calculators would show for your numbers. The lenders are shown in a random order.</p>
+    <ul class="cards" id="cards-s4"></ul>
+    <div class="actions">
+      <button type="button" class="back" data-back="3">Change my numbers</button>
+      <button type="button" class="primary" id="b-to-5">Continue</button>
+    </div>
+  </section>
+
+  <!-- Screen 5: your choice -->
+  <section id="s5" data-screen="5" aria-labelledby="h1-s5" hidden>
+    <p class="step">Step 5 of 6</p>
+    <h1 id="h1-s5" tabindex="-1">Your choice</h1>
+    <form id="f5" novalidate>
+      <div id="q-choice"></div>
+      <p class="form-error" id="e-f5" role="alert"></p>
+      <div class="actions">
+        <button type="button" class="back" data-back="4">See the results again</button>
+        <button type="submit" class="primary">Continue</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Screen 6: what was behind the numbers -->
+  <section id="s6" data-screen="6" aria-labelledby="h1-s6" hidden>
+    <p class="step">Step 6 of 6</p>
+    <h1 id="h1-s6" tabindex="-1">What was behind the numbers</h1>
+    <p>Each calculator works its amount out from fixed assumptions that its result does not show. Here they are, for the same nine lenders in the same order.</p>
+    <ul class="cards" id="cards-s6"></ul>
+    <form id="f6" novalidate>
+      <div id="q-after"></div>
+      <p class="form-error" id="e-f6" role="alert"></p>
+      <div class="actions"><button type="submit" class="primary" id="b-submit">Submit answers</button></div>
+    </form>
+  </section>
+
+  <!-- After submitting: debrief -->
+  <section id="s7" data-screen="7" aria-labelledby="h1-s7" hidden>
+    <h1 id="h1-s7" tabindex="-1">Thank you</h1>
+    <p class="lede" id="saved-line">Thank you for taking part.</p>
+    <h2>About what you saw</h2>
+    <ul>
+      <li>The nine results came from public online calculators. They are not loan offers or lenders’ decisions.</li>
+      <li>Each calculator is a fixed formula. None of them used a credit score.</li>
+      <li>Real lenders also check your credit history, job, documents and more, so a real offer can be very different.</li>
+      <li>This study does not recommend any lender.</li>
+    </ul>
+    <p>Questions about the study: <span class="contact">[study email to be added]</span>.</p>
+  </section>
+
+  <p class="footer">Not financial advice. The results are worked out from public calculators, not from any lender’s decision.</p>
+</main>
+<noscript><p class="wrap">This study needs JavaScript to work out the results.</p></noscript>
+</body>
+</html>

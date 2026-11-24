@@ -1,0 +1,6 @@
+{
+  "name": "loan-study",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" }
+}
