@@ -300,8 +300,24 @@ $('f6').addEventListener('submit', async (e) => {
   }
 });
 
-/** Phase 3 sends the record to the server. Until then nothing is sent or kept. */
+/** Sends the record (ranges, ranks and answers only) to the server, then remembers in this browser that it was sent. */
 async function save(record) {
-  window.studyRecord = record; // for checking during development only
-  $('saved-line').textContent = 'Thank you for taking part. (Test version: your answers were not saved.)';
+  const res = await fetch('api/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(record) });
+  if (!res.ok) {
+    let msg = `error ${res.status}`;
+    try { msg = (await res.json()).errors.join(' '); } catch { /* keep the status */ }
+    throw new Error(msg);
+  }
+  try { localStorage.setItem(ANSWERED, new Date().toISOString().slice(0, 10)); } catch { /* private mode: fine */ }
+  $('saved-line').textContent = 'Thank you for taking part. Your answers have been saved.';
 }
+
+// "Already answered" is remembered in this browser only (no cookie), so one person is not counted twice by accident.
+const ANSWERED = 'study-answered';
+try {
+  if (localStorage.getItem(ANSWERED)) {
+    $('already').hidden = false;
+    $('f1').hidden = true;
+  }
+} catch { /* storage blocked: the study still works */ }
+$('again').addEventListener('click', () => { $('already').hidden = true; $('f1').hidden = false; $('f1').elements.adult.focus(); });

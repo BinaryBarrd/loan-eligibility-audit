@@ -148,3 +148,87 @@ test('the saved record keeps ranges, ranks and answers, never an exact figure or
   assert.deepEqual(rec.lenders.map((l) => l.lender), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
   assert.equal(Math.min(...rec.lenders.filter((l) => l.shown).map((l) => l.rank)), 1);
 });
+
+// --- Phase 3: saving ----------------------------------------------------------
+const { checkRecord, indiaDay } = await import('../study/lib/schema.js');
+const { createHandler } = await import('../study/api/submit.js');
+const { toCsv, COLUMNS } = await import('../study/lib/csv.js');
+const { buildRecord } = await import('../study/public/record.js');
+
+const FULL = {
+  q1: '25–29', q2: 'Other', q2_other: 'Freelance, writer', q3: 'Science', q4: 'Doctorate',
+  q5: 'No', q6: 'Prefer not to say', q6c: 'Not sure', q6d: 'No', q6e: 'Yes', q6f: 'I’m not sure what that is',
+  q6a: 4, q6g: 'Prefer not to say', q6b_1: 2, q6b_2: 3, q6b_3: 5, q6h: 1,
+  q7: 4, q8: ['The largest amount', 'Other'], q8_other: 'It said "close"', q9: 2, q10: 5,
+  q11: 'A different lender', q11_lender: 8, q12: 1, q13: 'The interest rate it assumed',
+};
+function validRecord(answers = FULL) {
+  const numbers = { income: 40000, emis: 10000, other: 0, wanted: 2000000, age: 29, years: 5, rate: 10.5 };
+  return buildRecord({ numbers, cards: computeAll({ ...numbers, employment: 'salaried' }), answers });
+}
+const without = (o, k) => { const c = { ...o }; delete c[k]; return c; };
+
+test('a complete record passes the server check', () => {
+  assert.deepEqual(checkRecord(validRecord()), []);
+  const none = { ...without(without(without(FULL, 'q8'), 'q8_other'), 'q11_lender'), q7: 'none', q8a: ['I don’t need a loan'], q11: 'Same lender' };
+  assert.deepEqual(checkRecord(validRecord(none)), []);
+});
+
+test('the server check refuses anything outside the privacy table', () => {
+  const r = validRecord();
+  const cases = {
+    'extra top-level field': { ...r, ip: '1.2.3.4' },
+    'exact income': { ...r, numbers: { ...r.numbers, income: 40000 } },
+    'exact age': { ...r, numbers: { ...r.numbers, age: 29 } },
+    'missing required answer': { ...r, answers: without(r.answers, 'q1') },
+    'prefer not to say on q1': { ...r, answers: { ...r.answers, q1: 'Prefer not to say' } },
+    'unknown answer key': { ...r, answers: { ...r.answers, name: 'A' } },
+    'reason for none when a lender was chosen': { ...r, answers: { ...r.answers, q8a: ['I don’t need a loan'] } },
+    'other text without Other': { ...r, answers: { ...r.answers, q3_other: 'x' } },
+    'text over 100 characters': { ...r, answers: { ...r.answers, q2_other: 'x'.repeat(101) } },
+    'scale out of range': { ...r, answers: { ...r.answers, q9: 6 } },
+    'lender out of range': { ...r, answers: { ...r.answers, q7: 10 } },
+    'order not a permutation': { ...r, order: [1, 1, 2, 3, 4, 5, 6, 7, 8] },
+    'share not a 5% step': { ...r, lenders: r.lenders.map((l, i) => (i === 0 ? { ...l, share: 0.123 } : l)) },
+    'exact amount in lenders': { ...r, lenders: r.lenders.map((l, i) => (i === 0 ? { ...l, amount: 600000 } : l)) },
+    'wrong version': { ...r, version: 2 },
+  };
+  for (const [name, rec] of Object.entries(cases)) assert.ok(checkRecord(rec).length > 0, name);
+  assert.ok(checkRecord({ ...r, answers: { ...r.answers, q2_other: 'y'.repeat(9000) } }).length > 0, 'oversized');
+});
+
+test('POST /api/submit saves a checked record with the day only', async () => {
+  const saved = [];
+  const store = { async save(day, record) { saved.push({ day, record }); } };
+  const send = async (method, body, s = store) => {
+    const out = { status: 0, json: null };
+    const res = { setHeader() {}, status(x) { out.status = x; return this; }, json(j) { out.json = j; return this; } };
+    await createHandler(s)({ method, body }, res);
+    return out;
+  };
+  assert.equal((await send('POST', validRecord())).status, 201);
+  assert.equal(saved.length, 1);
+  assert.match(saved[0].day, /^\d{4}-\d{2}-\d{2}$/);
+  assert.deepEqual(Object.keys(saved[0].record).sort(), ['answers', 'lenders', 'numbers', 'order', 'version']);
+  assert.equal((await send('POST', { ...validRecord(), ip: 'x' })).status, 400);
+  assert.equal((await send('POST', 'not json')).status, 400);
+  assert.equal((await send('GET')).status, 405);
+  const failing = { async save() { throw new Error('down'); } };
+  assert.equal((await send('POST', validRecord(), failing)).status, 503);
+  assert.equal(saved.length, 1);
+});
+
+test('India date is used for the saved day', () => {
+  assert.equal(indiaDay(new Date('2026-11-25T20:00:00Z')), '2026-11-26');
+  assert.equal(indiaDay(new Date('2026-11-25T10:00:00Z')), '2026-11-25');
+});
+
+test('the CSV export has one flat row per participant and no row id', () => {
+  const csv = toCsv([{ day: '2026-11-26', record: validRecord() }]);
+  const [head, row] = csv.trim().split('\n');
+  assert.equal(head, COLUMNS.join(','));
+  assert.ok(!head.includes('id,') && head.startsWith('day,version,q1,'));
+  assert.ok(row.startsWith('2026-11-26,1,25–29,Other,"Freelance, writer",Science,,Doctorate,'));
+  assert.ok(row.includes('"It said ""close"""'));
+  assert.ok(row.includes('The largest amount; Other'));
+});
