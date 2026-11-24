@@ -34,8 +34,11 @@ const takeaways = [
 ];
 
 const f = (v) => (v[1] ? `${v[0]}/${v[1]}` : '—');
+// Highlight the key figures, as on the calculator pages (same pattern as markFigures in site/common.js).
+const FIGURE = /(₹[\d,]+(?:\.\d+)?(?: lakh)?|\d+(?:\.\d+)?%|\d+(?:\.\d+)? ×|\d+(?:\.\d+)?×|\b\d+(?:\.\d+)? (?:years?|months?)\b)/g;
+const mark = (s) => s.replace(FIGURE, '<mark>$1</mark>');
 const out = {
-  takeaways: takeaways.map(([t, d]) => `<li><strong>${esc(t)}</strong> ${esc(d)}</li>`).join('\n          '),
+  takeaways: takeaways.map(([t, d]) => `<li><strong>${esc(t)}</strong> ${mark(esc(d))}</li>`).join('\n          '),
   cards: PLATFORMS.map((p) => `<li><a class="card" href="${p.file}"><strong>${esc(p.name)}</strong><span class="kindline">${esc(p.kind)}</span><p class="rule">${esc(p.behind[0])}</p></a></li>`).join('\n          '),
   verification: PLATFORMS.map((p) => {
     const c = p.checks;

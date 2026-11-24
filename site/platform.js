@@ -1,6 +1,6 @@
 // One platform page: the calculator with the site's own boxes, what the page would show, the rule, and the audit findings.
 import { byId, PLATFORMS, run, activeFields } from './platforms.js';
-import { h, $, external, readField } from './common.js';
+import { h, $, external, readField, markFigures } from './common.js';
 import { inr, formatLimit, dateList } from './fmt.js';
 
 const p = byId[document.body.dataset.platform];
@@ -62,6 +62,13 @@ function render() {
   render.t = setTimeout(() => { $('announce').textContent = r.display.filter((d) => d && d.text).map((d) => d.text).join(' '); }, 700);
 }
 
+/** One folded part of the page: a heading you tap to open, with the content under it. */
+function fold(id, title, open, ...content) {
+  return h('details', { class: 'fold', open },
+    h('summary', {}, h('h2', { id }, title)),
+    h('div', { class: 'fold-body', role: 'region', 'aria-labelledby': id }, ...content));
+}
+
 function build() {
   document.title = `${p.name}: loan eligibility calculator audit`;
   const c = p.checks;
@@ -81,34 +88,31 @@ function build() {
       h('div', { class: 'result' }, h('div', { class: 'shows', id: 'shows' }), h('div', { class: 'notices', id: 'notices' }))),
     h('div', { class: 'sr-only', id: 'announce', 'aria-live': 'polite', 'aria-atomic': 'true' }),
 
-    h('div', { class: 'explain' },
-      h('div', { class: 'explain-block' }, h('h2', { class: 'h3' }, 'How it got this number'), h('div', { id: 'steps' })),
-      h('div', { class: 'explain-block' }, h('h2', { class: 'h3' }, 'What’s behind this number'), h('ul', {}, p.behind.map((t) => h('li', {}, t)))),
-      h('div', { class: 'explain-block' }, h('h2', { class: 'h3' }, 'What it ignores'), h('ul', {}, p.ignores.map((t) => h('li', {}, t))))),
+    h('section', { class: 'behind', 'aria-labelledby': 'behind-h' },
+      h('h2', { id: 'behind-h' }, 'What’s behind this number'),
+      h('ul', {}, p.behind.map((t) => h('li', {}, markFigures(t))))),
 
-    h('section', { class: 'section', 'aria-labelledby': 'rule-h' },
-      h('h3', { id: 'rule-h' }, 'The rule behind it'),
-      h('p', { class: 'formula' }, p.formula),
-      h('p', { class: 'small muted' }, 'A(rate, months) is the annuity factor: how many rupees of loan one rupee of monthly EMI repays at that yearly rate over that many months. Monthly figures throughout.'),
-      h('div', { class: 'table-scroll' }, h('table', { class: 'parts' },
-        h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, 'Part of the rule'), h('th', { scope: 'col' }, 'How sure'), h('th', { scope: 'col' }, 'Evidence'))),
-        h('tbody', {}, p.parts.map((x) => h('tr', {}, h('td', {}, x.what), h('td', {}, h('span', { class: `tag ${x.label}` }, x.label)), h('td', { class: 'muted' }, x.evidence)))))),
-      h('p', { class: 'small muted' }, 'seen: observed directly in the probes. inferred: consistent with every probe, but the exact value was not pinned down. unknown: not tested.')),
-
-    h('section', { class: 'section', 'aria-labelledby': 'find-h' },
-      h('h3', { id: 'find-h' }, 'What the audit found'),
-      h('ul', { class: 'findings' }, p.findings.map(([t, d]) => h('li', {}, h('strong', {}, `${t}. `), d)))),
-
-    h('section', { class: 'section', 'aria-labelledby': 'stats-h' },
-      h('h3', { id: 'stats-h' }, 'How well the rule matches'),
-      h('p', {}, `Every one of the ${comparable} comparable checks matched what the page showed, to within ₹1.`),
-      h('dl', { class: 'stats' },
-        h('div', {}, h('dt', {}, 'Rule-building checks'), h('dd', {}, `${c.build[0]}/${c.build[1]}`)),
-        h('div', {}, h('dt', {}, 'Held-out checks'), h('dd', {}, `${c.heldOut[0]}/${c.heldOut[1]}`)),
-        h('div', {}, h('dt', {}, 'Standard people'), h('dd', {}, c.persona[1] ? `${c.persona[0]}/${c.persona[1]}` : 'not run')),
-        h('div', {}, h('dt', {}, 'Not comparable'), h('dd', {}, String(c.notComparable)))),
-      c.notComparable ? h('p', { class: 'small muted' }, 'Not comparable: the page showed a warning and kept an old, greyed-out amount, so there was no current answer to compare.') : null,
-      h('p', { class: 'small' }, h('a', { href: `data/${p.id}.csv`, download: true }, `Download every check for ${p.name} (CSV)`))),
+    h('div', { class: 'folds' },
+      fold('steps-h', 'How it got this number', true, h('div', { id: 'steps' })),
+      fold('ignores-h', 'What it ignores', false, h('ul', {}, p.ignores.map((t) => h('li', {}, t)))),
+      fold('rule-h', 'The rule behind it', false,
+        h('p', { class: 'formula' }, p.formula),
+        h('p', { class: 'small muted' }, 'A(rate, months) is the annuity factor: how many rupees of loan one rupee of monthly EMI repays at that yearly rate over that many months. Monthly figures throughout.'),
+        h('div', { class: 'table-scroll' }, h('table', { class: 'parts' },
+          h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, 'Part of the rule'), h('th', { scope: 'col' }, 'How sure'), h('th', { scope: 'col' }, 'Evidence'))),
+          h('tbody', {}, p.parts.map((x) => h('tr', {}, h('td', {}, x.what), h('td', {}, h('span', { class: `tag ${x.label}` }, x.label)), h('td', { class: 'muted' }, x.evidence)))))),
+        h('p', { class: 'small muted' }, 'seen: observed directly in the probes. inferred: consistent with every probe, but the exact value was not pinned down. unknown: not tested.')),
+      fold('find-h', 'What the audit found', false,
+        h('ul', { class: 'findings' }, p.findings.map(([t, d]) => h('li', {}, h('strong', {}, `${t}. `), d)))),
+      fold('stats-h', 'How well the rule matches', false,
+        h('p', {}, `Every one of the ${comparable} comparable checks matched what the page showed, to within ₹1.`),
+        h('dl', { class: 'stats' },
+          h('div', {}, h('dt', {}, 'Rule-building checks'), h('dd', {}, `${c.build[0]}/${c.build[1]}`)),
+          h('div', {}, h('dt', {}, 'Held-out checks'), h('dd', {}, `${c.heldOut[0]}/${c.heldOut[1]}`)),
+          h('div', {}, h('dt', {}, 'Standard people'), h('dd', {}, c.persona[1] ? `${c.persona[0]}/${c.persona[1]}` : 'not run')),
+          h('div', {}, h('dt', {}, 'Not comparable'), h('dd', {}, String(c.notComparable)))),
+        c.notComparable ? h('p', { class: 'small muted' }, 'Not comparable: the page showed a warning and kept an old, greyed-out amount, so there was no current answer to compare.') : null,
+        h('p', { class: 'small' }, h('a', { href: `data/${p.id}.csv`, download: true }, `Download every check for ${p.name} (CSV)`)))),
 
     h('nav', { class: 'pager', 'aria-label': 'Platforms' },
       prev ? h('a', { href: prev.file }, `← ${prev.name}`) : h('a', { href: 'index.html' }, '← Overview'),

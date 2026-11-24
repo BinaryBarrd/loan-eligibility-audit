@@ -20,8 +20,18 @@ PLATFORMS = [  # (file, id, short name for the menu) in the order of platforms.j
     ("poonawalla.html", "poonawalla", "Poonawalla"),
     ("aditya-birla-capital.html", "aditya_birla", "Aditya Birla"),
 ]
+PLATFORM_NAMES = [  # (file, id, name in the Calculators menu)
+    ("bajaj-finserv.html", "bajaj_finserv", "Bajaj Finserv"),
+    ("paisabazaar.html", "paisabazaar", "Paisabazaar"),
+    ("kotak.html", "kotak", "Kotak Mahindra Bank"),
+    ("idfc-first.html", "idfc_first", "IDFC FIRST Bank"),
+    ("smfg.html", "smfg", "SMFG India Credit"),
+    ("axis.html", "axis", "Axis Bank"),
+    ("fibe.html", "fibe", "Fibe"),
+    ("poonawalla.html", "poonawalla", "Poonawalla Fincorp"),
+    ("aditya-birla-capital.html", "aditya_birla", "Aditya Birla Capital"),
+]
 TITLE = "Same person, different “You are eligible”"
-MENU = [("index.html#overview", "Overview")] + [(f, n) for f, _, n in PLATFORMS] + [("compare.html", "Compare"), ("method.html", "Method")]
 
 
 def module_graph(script):
@@ -36,6 +46,11 @@ def module_graph(script):
     return seen
 
 
+FONTS = "\n".join(
+    f'  <link rel="preload" href="fonts/{f}" as="font" type="font/woff2" crossorigin>'
+    for f in ("atkinson-hyperlegible-400.woff2", "atkinson-hyperlegible-700.woff2", "atkinson-hyperlegible-400-italic.woff2"))
+
+
 HEAD_START = """<!doctype html>
 <html lang="en-IN">
 <head>
@@ -46,13 +61,14 @@ HEAD_START = """<!doctype html>
   <title>{title}</title>
   <meta name="description" content="{desc}">
   <link rel="icon" href="data:,">
+{FONTS}
   <link rel="stylesheet" href="styles.css">
 """
 
 
 def head(title, script, desc):
     if not script:  # a page with no script at all
-        return HEAD_START.format(title=title, desc=desc) + "</head>\n"
+        return HEAD_START.format(title=title, desc=desc, FONTS=FONTS) + "</head>\n"
     preload = "\n".join(f'  <link rel="modulepreload" href="{m}">' for m in module_graph(script))
     return f"""<!doctype html>
 <html lang="en-IN">
@@ -64,6 +80,7 @@ def head(title, script, desc):
   <title>{title}</title>
   <meta name="description" content="{desc}">
   <link rel="icon" href="data:,">
+{FONTS}
   <link rel="stylesheet" href="styles.css">
 {preload}
   <script type="module" src="{script}"></script>
@@ -72,16 +89,32 @@ def head(title, script, desc):
 
 
 def header(current):
-    links = "\n".join(
-        f'          <a href="{f}"{" aria-current=\"page\"" if f.split("#")[0] == current else ""}>{n}</a>' for f, n in MENU)
+    """Overview, Calculators (a menu of the nine), Compare, Method. Every page is linked from every page."""
+    cur = lambda f: ' aria-current="page"' if f.split("#")[0] == current else ""
+    platform_files = [f for f, _, _ in PLATFORMS]
+    calc_links = "\n".join(
+        f'                <li><a href="{f}"{cur(f)}>{name}</a></li>' for f, name in [(f, full) for f, _, full in PLATFORM_NAMES])
+    in_menu = " current" if current in platform_files else ""
     return f"""    <header class="top">
       <div class="wrap">
         <p class="site-title"><a href="index.html#overview">{TITLE}</a></p>
         <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
       </div>
       <nav class="tabs" aria-label="Pages">
-        <div class="wrap tabs-inner scroll">
-{links}
+        <div class="wrap tabs-inner">
+          <ul class="menu-bar">
+            <li><a href="index.html#overview"{cur("index.html")}>Overview</a></li>
+            <li>
+              <details class="menu{in_menu}">
+                <summary>Calculators</summary>
+                <ul class="menu-panel">
+{calc_links}
+                </ul>
+              </details>
+            </li>
+            <li><a href="compare.html"{cur("compare.html")}>Compare</a></li>
+            <li><a href="method.html"{cur("method.html")}>Method</a></li>
+          </ul>
         </div>
       </nav>
     </header>

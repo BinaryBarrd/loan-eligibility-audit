@@ -8,6 +8,9 @@
   <title>SMFG: loan eligibility calculator audit</title>
   <meta name="description" content="The rule behind the SMFG personal-loan eligibility calculator, and what a black-box audit found.">
   <link rel="icon" href="data:,">
+  <link rel="preload" href="fonts/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-400-italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <link rel="modulepreload" href="platform.js">
   <link rel="modulepreload" href="platforms.js">
@@ -25,19 +28,28 @@
         <p class="stamp">Nine Indian personal-loan eligibility calculators, tested 14–19 November 2026. The sites may have changed since.</p>
       </div>
       <nav class="tabs" aria-label="Pages">
-        <div class="wrap tabs-inner scroll">
-          <a href="index.html#overview">Overview</a>
-          <a href="bajaj-finserv.html">Bajaj Finserv</a>
-          <a href="paisabazaar.html">Paisabazaar</a>
-          <a href="kotak.html">Kotak</a>
-          <a href="idfc-first.html">IDFC FIRST</a>
-          <a href="smfg.html" aria-current="page">SMFG</a>
-          <a href="axis.html">Axis</a>
-          <a href="fibe.html">Fibe</a>
-          <a href="poonawalla.html">Poonawalla</a>
-          <a href="aditya-birla-capital.html">Aditya Birla</a>
-          <a href="compare.html">Compare</a>
-          <a href="method.html">Method</a>
+        <div class="wrap tabs-inner">
+          <ul class="menu-bar">
+            <li><a href="index.html#overview">Overview</a></li>
+            <li>
+              <details class="menu current">
+                <summary>Calculators</summary>
+                <ul class="menu-panel">
+                <li><a href="bajaj-finserv.html">Bajaj Finserv</a></li>
+                <li><a href="paisabazaar.html">Paisabazaar</a></li>
+                <li><a href="kotak.html">Kotak Mahindra Bank</a></li>
+                <li><a href="idfc-first.html">IDFC FIRST Bank</a></li>
+                <li><a href="smfg.html" aria-current="page">SMFG India Credit</a></li>
+                <li><a href="axis.html">Axis Bank</a></li>
+                <li><a href="fibe.html">Fibe</a></li>
+                <li><a href="poonawalla.html">Poonawalla Fincorp</a></li>
+                <li><a href="aditya-birla-capital.html">Aditya Birla Capital</a></li>
+                </ul>
+              </details>
+            </li>
+            <li><a href="compare.html">Compare</a></li>
+            <li><a href="method.html">Method</a></li>
+          </ul>
         </div>
       </nav>
     </header>

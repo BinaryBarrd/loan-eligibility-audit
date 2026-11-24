@@ -26,6 +26,19 @@ export function readField(el) {
   return { value: Number(cleaned), error: '' };
 }
 
+/** Calculators menu: close it on Escape, or when you click or tab outside it. It also works without this. */
+export function menu() {
+  const m = document.querySelector('.menu');
+  if (!m) return;
+  const close = () => { m.open = false; };
+  document.addEventListener('click', (e) => { if (m.open && !m.contains(e.target)) close(); });
+  document.addEventListener('focusin', (e) => { if (m.open && !m.contains(e.target)) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && m.open) { close(); m.querySelector('summary').focus(); }
+  });
+}
+menu();
+
 /** Disclaimer gate (front page only). Nothing is stored: it shows on every arrival from outside; the menu links (#overview) skip it. */
 export function gate() {
   const d = $('disclaimer'); const app = $('app');
@@ -35,4 +48,10 @@ export function gate() {
     d.hidden = true; app.hidden = false; window.scrollTo(0, 0);
     app.querySelector('h1, h2')?.focus({ preventScroll: true });
   });
+}
+
+/** Highlights the key figures in a sentence (₹ amounts, percentages, “N ×”, years and months). */
+const FIGURE = /(₹[\d,]+(?:\.\d+)?(?: lakh)?|\d+(?:\.\d+)?%|\d+(?:\.\d+)? ×|\b\d+(?:\.\d+)? (?:years?|months?)\b)/g;
+export function markFigures(text) {
+  return String(text).split(FIGURE).map((part, i) => (i % 2 ? h('mark', {}, part) : part)).filter((x) => x !== '');
 }
