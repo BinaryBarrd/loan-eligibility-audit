@@ -244,3 +244,10 @@ test('question 6b is the published trusting stance–general technology scale, w
   ]);
   for (const q of items) assert.deepEqual([q.kind, ...q.ends], ['scale', 'Strongly disagree', 'Strongly agree']);
 });
+
+test('the study page itself never uses a calculator site\'s own result wording', () => {
+  const html = readFileSync(join(root, 'study/public/index.html'), 'utf8').toLowerCase();
+  for (const phrase of ['you are eligible', 'eligible loan amount', 'loan eligible amount', 'upto', "we're sorry"]) {
+    assert.ok(!html.includes(phrase), phrase);
+  }
+});

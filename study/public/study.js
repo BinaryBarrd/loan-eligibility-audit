@@ -238,7 +238,7 @@ function rateLine(c) {
 /** One row of the results list: the lender, its amount on the right, any note underneath. Same look for all nine. */
 function card(c, { behind }) {
   const amount = c.amount !== null
-    ? h('p', { class: 'rc-amt' }, h('span', { class: 'sr-only', text: 'Estimated amount: ' }), rs(c.amount))
+    ? h('p', { class: 'rc-amt' }, h('span', { class: 'sr-only', text: 'Most you could borrow: ' }), rs(c.amount))
     : h('p', { class: 'rc-amt none', text: 'No amount shown' });
   const notes = [
     c.amount === null ? h('p', { class: 'rc-note', text: c.reason }) : null,
