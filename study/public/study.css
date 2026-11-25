@@ -176,8 +176,11 @@ select.text { min-height: 48px; font: inherit; }
 .info h2 { font-size: 1.15rem; margin: 1rem 0 0.2rem; }
 
 /* The information as labelled rows: a short label, then its text. Side by side from 40rem. */
-.terms { margin: 1.6rem 0 2rem; border-top: 1px solid var(--line); }
-.term { padding: 1.1rem 0 0.5rem; border-bottom: 1px solid var(--line); }
+/* The whole information in one box, like the results list and the consent panel. */
+.terms { margin: 1.6rem 0 1.2rem; padding: 0 1rem; background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; }
+.term { padding: 1.1rem 0 0.5rem; }
+.term + .term { border-top: 1px solid var(--line); }
+@media (min-width: 40rem) { .terms { padding: 0 1.5rem; } }
 .term h2 { font-size: 1.15rem; margin: 0 0 0.45rem; }
 .term p { font-size: 1.05rem; }
 .term p.small { font-size: 0.95rem; }
@@ -187,7 +190,7 @@ select.text { min-height: 48px; font: inherit; }
 }
 
 /* What is kept, and what never is: two short lists side by side when there is room. */
-.kept { display: grid; gap: 0.6rem; margin: 0 0 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.kept { display: grid; gap: 0.6rem; margin: 0 0 0.6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
 .kept-col { background: var(--card); border-radius: 10px; padding: 0.8rem 0.95rem 0.3rem; }
 .kept-col h3 { font-size: 1rem; margin: 0 0 0.45rem; }
 .kept-col ul { font-size: 1rem; line-height: 1.45; padding-left: 1.1rem; margin: 0 0 0.5rem; }
