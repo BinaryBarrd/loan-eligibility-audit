@@ -232,3 +232,15 @@ test('the CSV export has one flat row per participant and no row id', () => {
   assert.ok(row.includes('"It said ""close"""'));
   assert.ok(row.includes('The largest amount; Other'));
 });
+
+test('question 6b is the published trusting stance–general technology scale, word for word', async () => {
+  const { BACKGROUND } = await import('../study/public/questions.js');
+  const items = BACKGROUND.filter((q) => q.key?.startsWith('q6b_'));
+  // McKnight, Carter, Thatcher & Clay (2011), ACM TMIS 2(2), Article 12, Appendix B.
+  assert.deepEqual(items.map((q) => q.text), [
+    'My typical approach is to trust new technologies until they prove to me that I shouldn’t trust them.',
+    'I usually trust a technology until it gives me a reason not to trust it.',
+    'I generally give a technology the benefit of the doubt when I first use it.',
+  ]);
+  for (const q of items) assert.deepEqual([q.kind, ...q.ends], ['scale', 'Strongly disagree', 'Strongly agree']);
+});

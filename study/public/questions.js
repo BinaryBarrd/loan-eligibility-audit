@@ -32,10 +32,15 @@ export const BACKGROUND = [
   { key: 'q6g', ...understand, pnts: true, text: 'How well do you understand how automated or AI systems reach their decisions?' },
 
   { group: 'How much do you agree?' },
-  // Draft wording (study plan, question 6b): to be replaced by items adapted from a published propensity-to-trust scale.
-  { key: 'q6b_1', ...agree, pnts: true, statement: true, text: 'I usually trust automated tools until I have a reason not to.' },
-  { key: 'q6b_2', ...agree, pnts: true, statement: true, text: 'Online tools generally give accurate results.' },
-  { key: 'q6b_3', ...agree, pnts: true, statement: true, text: 'I am comfortable relying on online tools for money decisions.' },
+  // Question 6b: "Trusting Stance—General Technology", word for word and in the published order.
+  // McKnight, Carter, Thatcher & Clay (2011), "Trust in a specific technology: An investigation of its
+  // components and measures", ACM TMIS 2(2), Article 12, Appendix B (Cronbach's alpha 0.86, Appendix E).
+  // The paper does not state its answer scale; this uses the 1–5 agree scale of Frazier, Johnson &
+  // Fainshmidt (2013), Journal of Trust Research 3(2), 76–97. Score: the mean of the three items (none
+  // is reverse-scored); report alpha for this sample.
+  { key: 'q6b_1', ...agree, pnts: true, statement: true, text: 'My typical approach is to trust new technologies until they prove to me that I shouldn’t trust them.' },
+  { key: 'q6b_2', ...agree, pnts: true, statement: true, text: 'I usually trust a technology until it gives me a reason not to trust it.' },
+  { key: 'q6b_3', ...agree, pnts: true, statement: true, text: 'I generally give a technology the benefit of the doubt when I first use it.' },
   { key: 'q6h', ...agree, pnts: true, statement: true, text: 'In general, I trust banks and lenders to treat customers fairly.' },
 ];
 
