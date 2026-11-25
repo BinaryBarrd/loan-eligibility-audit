@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
-  <title>How people read loan calculators</title>
+  <title>A short study on online loan eligibility calculators</title>
   <link rel="preload" href="fonts/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/atkinson-hyperlegible-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="study.css">
@@ -16,8 +16,8 @@
 
   <!-- Screen 1: information and consent -->
   <section id="s1" data-screen="1" aria-labelledby="h1-s1">
-    <h1 id="h1-s1" tabindex="-1">How people read loan calculators</h1>
-    <p class="lede">A short study, about seven minutes, on how people read the results of online loan eligibility calculators.</p>
+    <h1 id="h1-s1" tabindex="-1">A short study on online loan eligibility calculators</h1>
+    <p class="lede">It takes about seven minutes, and looks at how people read the results these calculators show.</p>
 
     <div class="terms">
       <section class="term" aria-labelledby="t-do">
@@ -126,7 +126,8 @@
     <p class="step">Step 3 of 5</p>
     <h1 id="h1-s4" tabindex="-1">Your results</h1>
     <p>What nine loan calculators would show for your numbers. The lenders are shown in a random order.</p>
-    <ul class="cards" id="cards-s4"></ul>
+    <p class="results-head" aria-hidden="true"><span>Lender</span><span>Estimated amount</span></p>
+    <ul class="results" id="cards-s4"></ul>
     <div class="actions">
       <button type="button" class="back" data-back="3">Change my numbers</button>
       <button type="button" class="primary" id="b-to-5">Continue</button>
@@ -152,7 +153,8 @@
     <p class="step">Step 5 of 5</p>
     <h1 id="h1-s6" tabindex="-1">What was behind the numbers</h1>
     <p>Each calculator works its amount out from fixed assumptions that its result does not show. Here they are, for the same nine lenders in the same order.</p>
-    <ul class="cards" id="cards-s6"></ul>
+    <p class="results-head" aria-hidden="true"><span>Lender</span><span>Estimated amount</span></p>
+    <ul class="results" id="cards-s6"></ul>
     <form id="f6" novalidate>
       <div id="q-after"></div>
       <p class="form-error" id="e-f6" role="alert"></p>

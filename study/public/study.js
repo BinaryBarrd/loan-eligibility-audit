@@ -31,6 +31,13 @@ function show(n) {
 }
 for (const b of document.querySelectorAll('[data-back]')) b.addEventListener('click', () => show(Number(b.dataset.back)));
 
+// A five-part bar under each "Step N of 5", filled up to N. The words stay for screen readers.
+for (const p of document.querySelectorAll('.step')) {
+  const [, n, of] = p.textContent.match(/Step (\d+) of (\d+)/).map(Number);
+  p.after(h('div', { class: 'bar', 'aria-hidden': 'true' },
+    Array.from({ length: of }, (_, i) => h('span', { class: i < n ? 'on' : null }))));
+}
+
 window.addEventListener('beforeunload', (e) => {
   if (state.screen > 1 && !state.finished) { e.preventDefault(); e.returnValue = ''; }
 });
@@ -54,21 +61,22 @@ function question(q) {
   if (q.group) return [h('h2', { text: q.group }), ...(q.help ? [h('p', { class: 'muted', text: q.help })] : [])];
   const legend = h('legend', {}, q.statement ? h('span', { class: 'statement', text: `“${q.text}”` }) : q.text);
   const fs = h('fieldset', { id: `f-${q.key}`, 'aria-describedby': `e-${q.key}` }, legend);
+  // "Prefer not to say" is a full answer like any other, drawn with a dashed edge so it reads as the way to skip.
+  const skip = (type) => { const l = optionLabel(type, q.key, PNTS, PNTS); l.classList.add('skip'); return l; };
   if (q.kind === 'scale') {
     fs.append(
       h('div', { class: 'scale' }, [1, 2, 3, 4, 5].map((v) => optionLabel('radio', q.key, String(v), String(v)))),
       h('p', { class: 'scale-ends', 'aria-hidden': 'true' }, h('span', { text: `1 = ${q.ends[0]}` }), h('span', { text: `5 = ${q.ends[1]}` })),
       h('p', { class: 'sr-only', text: `1 means ${q.ends[0]}, 5 means ${q.ends[1]}.` }));
-    if (q.pnts) fs.append(h('div', { class: 'options' }, optionLabel('radio', q.key, PNTS, PNTS)));
+    if (q.pnts) fs.append(h('div', { class: 'options skip-row' }, skip('radio')));
   } else {
     const type = q.kind === 'checks' ? 'checkbox' : 'radio';
     if (type === 'radio' && q.options.every((o) => o.length <= 12)) {
-      // Short answers (Yes, No, Not sure) sit in one row, with "Prefer not to say" underneath, like the scales.
-      fs.append(h('div', { class: 'options row' }, q.options.map((o) => optionLabel(type, q.key, o, o))));
-      if (q.pnts) fs.append(h('div', { class: 'options' }, optionLabel(type, q.key, PNTS, PNTS)));
+      // Short answers (Yes, No, Not sure) share one row, "Prefer not to say" included where it fits.
+      fs.append(h('div', { class: 'options row' }, q.options.map((o) => optionLabel(type, q.key, o, o)), q.pnts ? skip(type) : null));
     } else {
-      const opts = [...q.options, ...(q.pnts ? [PNTS] : [])];
-      fs.append(h('div', { class: 'options' }, opts.map((o) => optionLabel(type, q.key, o, o))));
+      const cls = q.options.length > 4 ? 'options long' : 'options';
+      fs.append(h('div', { class: cls }, q.options.map((o) => optionLabel(type, q.key, o, o)), q.pnts ? skip(type) : null));
     }
     if (q.other) fs.append(otherBox(q));
   }
@@ -116,7 +124,18 @@ $('f1').addEventListener('submit', (e) => {
 // ---------------------------------------------------------------------------
 // Screen 2: about you
 // ---------------------------------------------------------------------------
-$('q-background').append(...BACKGROUND.flatMap((q) => question(q)));
+/** Screen 2's questions in their groups (Background, Your experience, …), each a section of its own. */
+function groups(list) {
+  const out = [];
+  for (const q of list) if (q.group) out.push({ ...q, items: [] }); else out[out.length - 1].items.push(q);
+  return out;
+}
+$('q-background').append(...groups(BACKGROUND).map((g, i) => h('section', { class: 'qgroup', 'aria-labelledby': `g-${i}` },
+  h('div', { class: 'qgroup-head' },
+    h('h2', { id: `g-${i}` }, h('span', { text: g.group })),
+    h('p', { class: 'qgroup-count', text: `${g.items.length} questions` })),
+  g.help ? h('p', { class: 'qgroup-help', text: g.help }) : null,
+  ...g.items.map(question))));
 $('f2').addEventListener('submit', (e) => {
   e.preventDefault();
   if (collect(e.currentTarget, BACKGROUND, 'e-f2')) show(3);
@@ -216,16 +235,20 @@ function rateLine(c) {
   return h('p', { class: 'rate', text: c.rate.pct === typed ? `At your interest rate of ${typed}%.` : `At ${c.rate.pct}% a year, the nearest it allows to your ${typed}%.` });
 }
 
+/** One row of the results list: the lender, its amount on the right, any note underneath. Same look for all nine. */
 function card(c, { behind }) {
-  const head = h('h3', { text: `Lender ${c.lender}` });
-  const result = c.amount !== null
-    ? [h('p', { class: 'label', text: 'Estimated amount' }), h('p', { class: 'value', text: rs(c.amount) })]
-    : [h('p', { class: 'none', text: 'No amount shown' }), h('p', { class: 'reason', text: c.reason })];
-  const extra = behind
-    ? [h('p', { class: 'label behind', text: 'Behind this number' }),
-      h('ul', {}, [...c.assumptions, ...c.adjusted].map((t) => h('li', { text: t })))]
-    : rateLine(c);
-  return h('li', {}, h('article', { class: 'card', 'aria-label': `Lender ${c.lender}` }, head, result, extra));
+  const amount = c.amount !== null
+    ? h('p', { class: 'rc-amt' }, h('span', { class: 'sr-only', text: 'Estimated amount: ' }), rs(c.amount))
+    : h('p', { class: 'rc-amt none', text: 'No amount shown' });
+  const notes = [
+    c.amount === null ? h('p', { class: 'rc-note', text: c.reason }) : null,
+    behind ? null : rateLine(c),
+    behind ? h('div', { class: 'rc-behind' },
+      h('p', { class: 'rc-behind-label', text: 'Behind this number' }),
+      h('ul', {}, [...c.assumptions, ...c.adjusted].map((t) => h('li', { text: t })))) : null,
+  ];
+  return h('li', {}, h('article', { class: 'rc', 'aria-label': `Lender ${c.lender}` },
+    h('div', { class: 'rc-head' }, h('h3', { text: `Lender ${c.lender}` }), amount), ...notes));
 }
 
 function drawResults() {
