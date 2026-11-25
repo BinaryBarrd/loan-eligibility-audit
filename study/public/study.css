@@ -151,6 +151,32 @@ select.text { min-height: 48px; font: inherit; }
 /* --- Consent ---------------------------------------------------------------- */
 .info { display: grid; gap: 0.2rem; margin: 1.2rem 0 1.6rem; }
 .info h2 { font-size: 1.15rem; margin: 1rem 0 0.2rem; }
+
+/* The information as labelled rows: a short label, then its text. Side by side from 40rem. */
+.terms { margin: 1.6rem 0 2rem; border-top: 1px solid var(--line); }
+.term { padding: 1.1rem 0 0.5rem; border-bottom: 1px solid var(--line); }
+.term h2 { font-size: 1.15rem; margin: 0 0 0.45rem; }
+.term p { font-size: 1.05rem; }
+.term p.small { font-size: 0.95rem; }
+@media (min-width: 40rem) {
+  .term { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 1.5rem; padding: 1.3rem 0 0.6rem; }
+  .term h2 { margin: 0.1rem 0 0; }
+}
+
+/* What is kept, and what never is: two short lists side by side when there is room. */
+.kept { display: grid; gap: 0.6rem; margin: 0 0 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.kept-col { background: var(--card); border-radius: 10px; padding: 0.8rem 0.95rem 0.3rem; }
+.kept-col h3 { font-size: 1rem; margin: 0 0 0.45rem; }
+.kept-col ul { font-size: 1rem; line-height: 1.45; padding-left: 1.1rem; margin: 0 0 0.5rem; }
+.kept-col li { margin-bottom: 0.4rem; }
+
+/* The two consent boxes and Start, together in one panel. */
+.consent { background: var(--sheet); border: 1px solid var(--field-line); border-radius: 14px; padding: 1.1rem 1rem 1.2rem; }
+.consent fieldset { margin-bottom: 0; }
+.consent legend { font-size: 1.2rem; margin-bottom: 0.7rem; }
+.consent .actions { margin-top: 1.1rem; }
+.consent button.primary { max-width: none; }
+@media (min-width: 40rem) { .consent { padding: 1.4rem 1.5rem 1.5rem; } .consent button.primary { max-width: 22rem; } }
 .agree .option { background: var(--card); }
 
 /* --- Result cards: identical for every lender -------------------------------- */
